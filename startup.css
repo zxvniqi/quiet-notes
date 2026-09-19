@@ -1,12 +1,12 @@
 /* Neutral loader branding, including while the saved mode is being restored.
    For coverage BEFORE extension loading, import this file from public/css/user.css. */
 #preloader { background: #f7f8fa !important; color: #506b87 !important; backdrop-filter: none !important; }
-#preloader .splash-logo { display: none !important; }
-#preloader .splash-message { font-size: 0 !important; }
-#preloader .splash-message::after { content: '문서 준비 중'; font: 500 15px/1.6 system-ui, sans-serif; }
-#preloader #load-spinner { width: 40px !important; height: 48px !important; animation: none !important; }
-#preloader #load-spinner > * { display: none !important; }
-#preloader #load-spinner::before {
+html body #loader.splash-screen .splash-logo { display: none !important; }
+html body #loader.splash-screen .splash-message { font-size: 0 !important; }
+html body #loader.splash-screen .splash-message::after { content: '문서 준비 중'; font: 500 15px/1.6 system-ui, sans-serif; }
+html body #load-spinner { width: 40px !important; height: 48px !important; animation: none !important; }
+html body #load-spinner > * { display: none !important; }
+html body #load-spinner::before {
   content: '' !important; display: block; width: 32px; height: 42px;
   box-sizing: border-box; border: 2px solid #506b87; border-radius: 4px;
   background: linear-gradient(#b9c6d4,#b9c6d4) 6px 12px / 16px 2px no-repeat,
@@ -15,4 +15,11 @@
   animation: qn-loading 1.4s ease-in-out infinite;
 }
 @keyframes qn-loading { 50% { opacity: .4; } }
-@media (prefers-reduced-motion: reduce) { #preloader #load-spinner::before { animation: none; } }
+@media (prefers-reduced-motion: reduce) { html body #load-spinner::before { animation: none; } }
+
+/* Newer versions render the splash inside a dialog rather than #preloader. */
+html body .popup:has(#loader.splash-screen) { background: #f7f8fa !important; color: #506b87 !important; box-shadow: none !important; border: 0 !important; }
+html body .popup:has(#loader.splash-screen)::backdrop { background: #f7f8fa !important; backdrop-filter: none !important; }
+html body #loader.splash-screen { gap: 24px !important; }
+html body #loader.splash-screen .splash-message::before { content: none !important; display: none !important; }
+html body #loader.splash-screen .splash-message::after { color: #506b87 !important; display: block !important; line-height: 1.6 !important; }

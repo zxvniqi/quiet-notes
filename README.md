@@ -42,3 +42,5 @@ https://github.com/zxvniqi/quiet-notes
 SillyTavern 1.18.0의 기본 상단바, Chat Top Bar, Quick Replies DOM 구조를 기준으로 만들었습니다. 모든 제3자 확장 조합이나 생성 동작을 보증하지는 않습니다.
 
 끄려면 일코 OFF. 제거하려면 확장 관리에서 제거한 뒤 새로고침하세요. 시작용 CSS를 별도로 추가했다면 그 import 줄도 제거하세요.
+
+로딩 팝업과 아이콘 호환 구조는 [Blue Lemonade 3.7.9](https://github.com/kgangkgang/blue-lemonade)를 참고했습니다. 해당 확장의 코드를 복사하거나 설정을 변경하지 않습니다.
