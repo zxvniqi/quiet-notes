@@ -55,7 +55,7 @@ node "$HOME/quiet-notes-startup.cjs" --remove
 node startup-setup.cjs --root "D:\SillyTavern"
 ```
 
-서버의 `public/css/user.css`에 시작용 CSS를 직접 넣습니다. 별도 CSS 요청을 기다리지 않고 첫 로딩부터 적용됩니다. 기존 user.css 내용은 보존하며, 최초 변경 전 `.quiet-notes-backup` 백업을 남깁니다. 여러 번 실행해도 중복되지 않습니다. 테마 파일이나 실리 코어 코드는 수정하지 않습니다.
+현재 버전은 `config.yaml`의 `dataRoot`를 읽어 데이터 폴더의 `_css/user.css`에 시작용 CSS를 직접 넣습니다. 구버전만 `public/css/user.css`를 사용합니다. 이전 설치 도구가 public 경로에 넣은 규칙은 자동으로 정리합니다. 별도 CSS 요청을 기다리지 않고 첫 로딩부터 적용됩니다. 기존 user.css 내용은 보존하며, 최초 변경 전 `.quiet-notes-backup` 백업을 남깁니다. 여러 번 실행해도 중복되지 않습니다. 테마 파일이나 실리 코어 코드는 수정하지 않습니다.
 
 실리 화면을 새로고침해 확인하세요. 이 설정은 서버의 모든 사용자에게 중립 로딩 화면을 적용하며, 일코 OFF 상태에서도 동일합니다. 앱 설치 아이콘이나 HTML의 초기 탭 제목을 바꾸지는 않습니다.
 
@@ -65,7 +65,7 @@ node startup-setup.cjs --root "D:\SillyTavern"
 node startup-setup.cjs --root "D:\SillyTavern" --remove
 ```
 
-서버에서 실행하기 어려우면 `startup.css` 내용을 `public/css/user.css` 끝에 직접 덧붙여도 됩니다. 기존 내용은 지우지 마세요.
+서버에서 실행하기 어려우면 `startup.css` 내용을 실제로 제공되는 사용자 CSS 끝에 직접 덧붙여도 됩니다. 최신 기본 경로는 `data/_css/user.css`입니다. 기존 내용은 지우지 마세요.
 
 ## 호환 및 제거
 
@@ -74,3 +74,7 @@ SillyTavern 1.18.0의 기본 상단바, Chat Top Bar, Quick Replies DOM 구조�
 끄려면 일코 OFF. 제거하려면 확장 관리에서 제거한 뒤 새로고침하세요. 시작용 CSS도 적용했다면 위의 되돌리기를 먼저 실행하세요.
 
 로딩 팝업과 아이콘 호환 구조는 [Blue Lemonade 3.7.9](https://github.com/kgangkgang/blue-lemonade)를 참고했습니다. 해당 확장의 코드를 복사하거나 설정을 변경하지 않습니다.
+
+### 기존 로딩이 먼저 보였던 문제
+
+초기 설치 도구는 예전 public 경로에 기록해, 최신 실리에서 사용하지 않는 파일을 변경했습니다. 수정된 명령을 다시 내려받아 실행하면 실제 데이터 경로에 적용됩니다. 명령 완료 메시지에 표시되는 대상 경로를 확인하고 새로고침하세요.
