@@ -76,7 +76,12 @@
     }
     details.append(summary, panel);
     bar.append(details);
-    document.body.append(bar);
+    // Reserve real layout space above the composer instead of covering it.
+    const modeDock = document.createElement('div');
+    modeDock.id = 'qn-mode-dock';
+    const composer = document.getElementById('form_sheld');
+    if (composer) composer.before(modeDock);
+    else (document.getElementById('sheld') || document.body).prepend(modeDock);
     document.addEventListener('pointerdown', e => { if (!details.contains(e.target)) details.open = false; }, { signal: abort.signal });
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && details.open) { details.open = false; summary.focus(); }
@@ -116,6 +121,7 @@
       abort.abort();
       titleObserver.disconnect();
       bar.remove();
+      modeDock.remove();
       composeButton.remove();
       settingsPanel.remove();
       state.enabled = false;
@@ -129,6 +135,8 @@
     function apply() {
       root.classList.add('qn-installed');
       root.classList.toggle('qn-active', state.enabled);
+      const barHost = state.enabled ? document.body : modeDock;
+      if (bar.parentElement !== barHost) barHost.append(bar);
       for (const key of ['top', 'compose', 'avatars', 'media', 'embeds', 'names']) {
         root.classList.toggle('qn-' + key + '-visible', state[key]);
       }
