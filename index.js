@@ -36,7 +36,7 @@
       return item;
     }
     const topButton = button('top', '도구', '상단 도구 열기/접기', () => { state.top = !state.top; apply(); });
-    const composeButton = button('compose', '빠른 입력 ▾', '빠른 입력 열기/접기', () => {
+    const composeButton = button('compose', '입력', '입력 바 열기/접기', () => {
       state.compose = !state.compose;
       apply();
       // Deliberately do not focus the textarea: avoid opening the phone keyboard.
@@ -45,9 +45,7 @@
     modeButton.id = 'qn-mode-toggle';
     composeButton.id = 'qn-input-toggle';
     composeButton.setAttribute('aria-controls', 'form_sheld');
-    const form = document.getElementById('form_sheld');
-    if (form) form.before(composeButton);
-    bar.append(topButton, modeButton);
+    bar.append(topButton, composeButton, modeButton);
     const details = document.createElement('details');
     details.id = 'qn-options';
     const summary = document.createElement('summary');
@@ -58,7 +56,7 @@
     const toggles = {};
     for (const [key, text] of [
       ['avatars', '프로필 사진 표시'], ['media', '본문 이미지·에셋 표시'],
-      ['embeds', '임베드 패널 표시'], ['names', '대화 이름 표시'], ['enabled', '메모 테마 사용'],
+      ['embeds', '임베드 패널 표시'], ['names', '대화 이름 표시'],
     ]) {
       const label = document.createElement('label');
       const input = document.createElement('input');
@@ -68,8 +66,6 @@
       panel.append(label);
       toggles[key] = input;
     }
-    const reset = button('reset', '기본 보기', '메모 기본 보기로 되돌리기', () => { state = { ...defaults }; apply(); });
-    panel.append(reset);
     details.append(summary, panel);
     bar.append(details);
     document.body.append(bar);
@@ -130,8 +126,6 @@
       topButton.setAttribute('aria-expanded', String(!state.enabled || state.top));
       composeButton.setAttribute('aria-expanded', String(!state.enabled || state.compose));
       topButton.disabled = composeButton.disabled = !state.enabled;
-      composeButton.textContent = state.compose ? '빠른 입력 ▴' : '빠른 입력 ▾';
-      root.classList.toggle('qn-qr-visible', state.compose);
       modeButton.textContent = state.enabled ? '일코 ON' : '일코 OFF';
       modeButton.setAttribute('aria-pressed', String(state.enabled));
       for (const [key, input] of Object.entries(toggles)) input.checked = state[key];

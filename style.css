@@ -233,8 +233,7 @@ html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #top-settings-h
   top: var(--qn-header) !important; height: 44px !important; min-height: 44px !important;
   opacity: 1 !important; visibility: visible !important;
 }
-html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #top-settings-holder::after,
-html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar::before { display: none !important; }
+html.qn-active.qn-active.qn-active #top-settings-holder::after { display: none !important; }
 html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-top-visible) :is(#top-settings-holder,#top-bar,#extensionTopBar,#extensionConnectionProfiles) { display: none !important; }
 html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active.qn-top-visible #extensionTopBar {
   display: flex !important; position: relative !important; inset: auto !important;
@@ -246,26 +245,6 @@ html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active.qn-top-visible 
 }
 .qn-active #extensionTopBar :is(input,select) { min-width: 0 !important; max-width: 100% !important; flex: 1 1 140px; color: #394452 !important; background: #fff !important; }
 .qn-active #extensionTopBar i { min-width: 30px; min-height: 30px; align-content: center; opacity: 1 !important; }
-html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar {
-  display: flex !important; position: relative !important; flex-direction: column !important;
-  flex-wrap: nowrap !important; width: 100% !important; min-width: 0 !important;
-  height: auto !important; max-height: min(280px,35dvh) !important;
-  overflow-x: hidden !important; overflow-y: auto !important;
-  margin: 0 !important; padding: 4px 0 !important; gap: 5px !important;
-}
-html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-qr-visible) #qr--bar { display: none !important; }
-html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar > .qr--buttons {
-  display: flex !important; flex-flow: row nowrap !important; flex: 0 0 auto !important;
-  width: 100% !important; min-width: 0 !important; max-width: 100% !important;
-  height: 42px !important; min-height: 42px !important; max-height: 42px !important;
-  overflow-x: auto !important; overflow-y: hidden !important; opacity: 1 !important;
-  visibility: visible !important; padding: 2px !important; gap: 5px !important;
-  border-bottom: 1px solid #dce1e7; scrollbar-width: thin; touch-action: pan-x;
-}
-html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar > .qr--buttons > * {
-  flex: 0 0 auto !important; width: auto !important; max-width: none !important;
-  height: 32px !important; white-space: nowrap !important; padding: 3px 10px !important;
-}
 html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #send_form,
 html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #nonQRFormItems {
   max-height: none !important; opacity: 1 !important; visibility: visible !important;
@@ -280,14 +259,6 @@ html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-compose
   .qn-active #top-settings-holder .drawer { flex: 1 1 0; min-width: 0; }
   .qn-active #top-settings-holder .drawer-icon { width: 100% !important; }
 }
-/* A single bottom disclosure controls QR and the entire composer together. */
-#qn-input-toggle { display: none !important; }
-html.qn-active #qn-input-toggle {
-  display: block !important; flex: 0 0 40px !important; order: 0 !important;
-  width: 100% !important; min-height: 40px !important; margin: 0 !important;
-  padding: 7px 12px !important; border: 0 !important; border-top: 1px solid #dce1e7 !important;
-  border-radius: 0 !important; background: #f7f8fa !important; color: #506078 !important;
-  font: 500 13px/1.5 system-ui, sans-serif !important; text-shadow: none !important;
-  box-shadow: none !important; cursor: pointer; touch-action: manipulation;
-}
-html.qn-active #qn-input-toggle:focus-visible { outline: 2px solid #376d9e; outline-offset: -3px; }
+
+/* Hide the repository owner badge in this extension row only, in both modes. */
+.extension_block[data-name="/quiet-notes"] .extension_author { display: none !important; }
