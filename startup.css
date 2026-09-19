@@ -1,0 +1,18 @@
+/* Neutral loader branding, including while the saved mode is being restored.
+   For coverage BEFORE extension loading, import this file from public/css/user.css. */
+#preloader { background: #f7f8fa !important; color: #506b87 !important; backdrop-filter: none !important; }
+#preloader .splash-logo { display: none !important; }
+#preloader .splash-message { font-size: 0 !important; }
+#preloader .splash-message::after { content: '문서 준비 중'; font: 500 15px/1.6 system-ui, sans-serif; }
+#preloader #load-spinner { width: 40px !important; height: 48px !important; animation: none !important; }
+#preloader #load-spinner > * { display: none !important; }
+#preloader #load-spinner::before {
+  content: '' !important; display: block; width: 32px; height: 42px;
+  box-sizing: border-box; border: 2px solid #506b87; border-radius: 4px;
+  background: linear-gradient(#b9c6d4,#b9c6d4) 6px 12px / 16px 2px no-repeat,
+              linear-gradient(#b9c6d4,#b9c6d4) 6px 20px / 16px 2px no-repeat,
+              linear-gradient(#b9c6d4,#b9c6d4) 6px 28px / 11px 2px no-repeat;
+  animation: qn-loading 1.4s ease-in-out infinite;
+}
+@keyframes qn-loading { 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { #preloader #load-spinner::before { animation: none; } }

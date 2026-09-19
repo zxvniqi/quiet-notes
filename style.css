@@ -1,0 +1,282 @@
+@import url('./startup.css');
+@import url('./icons.css');
+/* Quiet Notes. Scoped to qn-active; disabling restores the existing theme. */
+:root.qn-active, .qn-active body {
+  --SmartThemeBodyColor: #252b34;
+  --SmartThemeEmColor: #606873;
+  --SmartThemeQuoteColor: #465c73;
+  --SmartThemeBlurTintColor: #f7f8fa;
+  --SmartThemeChatTintColor: #ffffff;
+  --SmartThemeUserMesBlurTintColor: #f4f6f8;
+  --SmartThemeBotMesBlurTintColor: #ffffff;
+  --SmartThemeBorderColor: #dce1e7;
+  --SmartThemeShadowColor: transparent;
+  --SmartThemeBlurStrength: 0px;
+  --shadowWidth: 0;
+  --qn-header: calc(46px + env(safe-area-inset-top, 0px));
+  --qn-tools: 0px;
+  --topBarBlockSize: 44px;
+  --topBarIconSize: 20px;
+  --mainFontSize: 16px;
+  --sheldWidth: min(900px, 100vw);
+  color-scheme: light;
+}
+:root.qn-active.qn-top-visible, .qn-active.qn-top-visible body { --qn-tools: 44px; }
+.qn-active body {
+  background: #f0f2f5 !important;
+  color: #252b34;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+  text-shadow: none !important;
+}
+.qn-active :is(#bg1, #bg_custom) { visibility: hidden !important; }
+.qn-active #sheld {
+  top: calc(var(--qn-header) + var(--qn-tools)) !important;
+  height: calc(100vh - var(--qn-header) - var(--qn-tools)) !important;
+  height: calc(100dvh - var(--qn-header) - var(--qn-tools)) !important;
+  max-height: calc(100dvh - var(--qn-header) - var(--qn-tools)) !important;
+  width: min(900px, 100vw) !important;
+  max-width: 100vw !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 auto !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+  background: #fff;
+  border-inline: 1px solid #e3e7ec;
+}
+.qn-active #chat {
+  min-height: 0;
+  max-height: none !important;
+  flex: 1 1 auto;
+  background: #fff !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  scrollbar-width: thin;
+  scrollbar-color: #b9c1cb transparent;
+  scroll-padding-block: 24px;
+}
+.qn-active #chat .mes {
+  padding: 22px clamp(16px, 4vw, 44px) !important;
+  border: 0 !important;
+  border-bottom: 1px solid #edf0f3 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: #fff !important;
+  color: #252b34;
+  gap: 12px;
+}
+.qn-active #chat .mes[is_user="true"] { background: #f5f7f9 !important; }
+.qn-active #chat .mes_block { min-width: 0; flex: 1; padding-left: 0 !important; }
+.qn-active #chat .mes_text {
+  font-size: 16px;
+  line-height: 1.85;
+  letter-spacing: -.012em;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  color: #252b34;
+}
+.qn-active #chat .mes_text p { margin-block: 0 1em; }
+.qn-active #chat .mes_text p:last-child { margin-bottom: 0; }
+.qn-active #chat .mes_text :is(em, i) { color: #606873; }
+.qn-active #chat .mes_text blockquote {
+  margin-inline: 0;
+  border-left: 3px solid #cbd3dc;
+  padding: 8px 14px;
+  background: #f7f8fa;
+  color: #465c73;
+}
+.qn-active #chat .mes_text pre { max-width: 100%; overflow-x: auto; white-space: pre; }
+.qn-active #chat .mes_text table { display: block; max-width: 100%; overflow-x: auto; }
+.qn-active #chat .mes_text a { color: #245f92; text-decoration: underline; }
+.qn-active #chat .ch_name { font-size: 13px; color: #606873; margin-bottom: 8px; }
+.qn-active:not(.qn-top-visible) #chat .welcomePanel { display: none !important; }
+.qn-active #chat .welcomeHeaderLogo { display: none !important; }
+.qn-active #chat .welcomeHeaderVersionDisplay { font-size: 0 !important; }
+.qn-active #chat .welcomeHeaderVersionDisplay > * { display: none !important; }
+.qn-active #chat .welcomeHeaderVersionDisplay::after { content: '최근 문서'; font-size: 18px; font-weight: 600; }
+.qn-active #chat :is(.mes_buttons, .extraMesButtons) { color: #697582; }
+.qn-active #form_sheld { flex: 0 0 auto; margin: 0; }
+.qn-active #send_form {
+  border: 0 !important;
+  border-top: 1px solid #dce1e7 !important;
+  border-radius: 0 !important;
+  background: #f7f8fa !important;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+.qn-active #send_textarea {
+  font-family: inherit;
+  font-size: 16px !important;
+  line-height: 1.6;
+  color: #252b34 !important;
+  background: #fff !important;
+  border: 1px solid #dce1e7 !important;
+  border-radius: 8px;
+  min-height: 44px;
+  max-height: min(220px, 32dvh) !important;
+  padding: 10px 12px;
+}
+.qn-active #send_textarea::placeholder { color: #747e8a; }
+.qn-active #top-settings-holder {
+  position: fixed !important;
+  top: var(--qn-header) !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: min(900px, 100vw) !important;
+  height: 44px !important;
+  background: #f7f8fa;
+  border-bottom: 1px solid #dce1e7;
+}
+.qn-active #top-bar { top: var(--qn-header) !important; background: #f7f8fa !important; box-shadow: none !important; }
+.qn-active:not(.qn-top-visible) :is(#top-settings-holder, #top-bar, #extensionTopBar, #extensionConnectionProfiles) { display: none !important; }
+.qn-active #extensionTopBar { flex-shrink: 0; background: #f7f8fa; border-bottom: 1px solid #dce1e7; }
+.qn-active :is(.drawer-content, #left-nav-panel, #right-nav-panel) {
+  top: calc(var(--qn-header) + 44px) !important;
+  max-height: calc(100dvh - var(--qn-header) - 44px) !important;
+  background-color: #f7f8fa;
+  text-shadow: none;
+}
+.qn-active:not(.qn-compose-visible) #form_sheld { display: none !important; }
+.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container) img { visibility: hidden !important; }
+.qn-active:not(.qn-avatars-visible) #chat :is(.avatar, .avatar-container) { display: none !important; }
+.qn-active:not(.qn-avatars-visible) :is(.zoomed_avatar, #expression-holder, .expression-holder) { display: none !important; }
+.qn-active:not(.qn-media-visible) #chat .mes_text :is(img, video, canvas),
+.qn-active:not(.qn-media-visible) #chat :is(.mes_img_container, .mes_img, .mes_media, .mes_media_container),
+.qn-active:not(.qn-media-visible) :is(#expression-holder, .expression-holder) { display: none !important; }
+.qn-active:not(.qn-media-visible) #chat .mes_text,
+.qn-active:not(.qn-media-visible) #chat .mes_text * { background-image: none !important; }
+.qn-active:not(.qn-media-visible) #chat .mes_text *::before,
+.qn-active:not(.qn-media-visible) #chat .mes_text *::after { background-image: none !important; }
+.qn-active:not(.qn-embeds-visible) #chat .mes_text :is(iframe, object, embed) { display: none !important; }
+/* Replace just the speaker name; keep message action buttons and metadata reachable. */
+.qn-active:not(.qn-names-visible) #chat .ch_name .name_text { font-size: 0 !important; }
+.qn-active:not(.qn-names-visible) #chat .ch_name .name_text::after { content: '메모'; font-size: 13px; }
+.qn-active:not(.qn-names-visible) #chat .mes[is_user="true"] .ch_name .name_text::after { content: '작성'; }
+#qn-controls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 46px;
+  padding: env(safe-area-inset-top, 0px) max(12px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));
+  box-sizing: border-box;
+  border-bottom: 1px solid #dce1e7;
+  background: #fafbfc;
+  color: #394452;
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+  text-shadow: none;
+}
+#qn-controls .qn-brand { flex: 1; font-weight: 600; letter-spacing: .02em; }
+#qn-controls button, #qn-controls summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  min-width: 48px;
+  padding: 0 12px;
+  margin: 0;
+  box-sizing: border-box;
+  color: #394452;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+  list-style: none;
+  box-shadow: none;
+  text-shadow: none;
+  touch-action: manipulation;
+}
+#qn-controls summary::-webkit-details-marker { display: none; }
+#qn-controls button:hover, #qn-controls summary:hover { background: #edf0f4; }
+#qn-controls button[aria-expanded="true"] { background: #e8edf3; }
+#qn-controls button:disabled { opacity: .45; cursor: default; }
+#qn-controls :is(button, summary, input):focus-visible { outline: 2px solid #376d9e; outline-offset: -2px; }
+#qn-controls .qn-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: max(8px, env(safe-area-inset-right, 0px));
+  width: min(272px, calc(100vw - 16px));
+  padding: 10px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #dce1e7;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px #27313f18;
+}
+#qn-controls .qn-panel label { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+#qn-controls .qn-panel input { width: 18px; height: 18px; accent-color: #506b87; }
+/* Keep one unobtrusive recovery control when the theme is switched off. */
+.qn-installed:not(.qn-active) #qn-controls { top: auto; bottom: 8px; left: auto; width: auto; border: 1px solid #dce1e7; border-radius: 8px; padding: 0 4px; }
+.qn-installed:not(.qn-active) #qn-controls > :not(#qn-mode-toggle) { display: none; }
+.qn-installed:not(.qn-active) #qn-controls .qn-panel { top: auto; bottom: calc(100% + 6px); }
+@media (max-width: 600px) {
+  .qn-active #sheld { border-inline: 0; }
+  .qn-active #chat .mes { padding: 18px 16px !important; }
+  .qn-active #chat .mes_text { line-height: 1.8; }
+  .qn-active #send_form { padding-inline: 5px; }
+  #qn-controls button, #qn-controls summary { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #qn-controls *, .qn-active #sheld { transition: none !important; animation: none !important; }
+}
+
+/* Explicit click states outrank the original theme's hover/slider selectors.
+   No original nodes or handlers are replaced. OFF removes these overrides. */
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #top-settings-holder {
+  display: flex !important; flex-wrap: nowrap !important; justify-content: center !important;
+  margin: 0 auto !important; padding: 0 !important; transform: none !important;
+  top: var(--qn-header) !important; height: 44px !important; min-height: 44px !important;
+  opacity: 1 !important; visibility: visible !important;
+}
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #top-settings-holder::after,
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar::before { display: none !important; }
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-top-visible) :is(#top-settings-holder,#top-bar,#extensionTopBar,#extensionConnectionProfiles) { display: none !important; }
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active.qn-top-visible #extensionTopBar {
+  display: flex !important; position: relative !important; inset: auto !important;
+  width: 100% !important; min-width: 0 !important; height: auto !important;
+  min-height: 42px !important; max-height: none !important; margin: 0 !important;
+  padding: 5px 8px !important; flex: 0 0 auto !important; flex-wrap: wrap !important;
+  gap: 4px !important; opacity: 1 !important; visibility: visible !important;
+  transform: none !important; background: #f7f8fa !important; color: #394452 !important;
+}
+.qn-active #extensionTopBar :is(input,select) { min-width: 0 !important; max-width: 100% !important; flex: 1 1 140px; color: #394452 !important; background: #fff !important; }
+.qn-active #extensionTopBar i { min-width: 30px; min-height: 30px; align-content: center; opacity: 1 !important; }
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar {
+  display: flex !important; position: relative !important; flex-direction: column !important;
+  flex-wrap: nowrap !important; width: 100% !important; min-width: 0 !important;
+  height: auto !important; max-height: min(280px,35dvh) !important;
+  overflow-x: hidden !important; overflow-y: auto !important;
+  margin: 0 !important; padding: 4px 0 !important; gap: 5px !important;
+}
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-qr-visible) #qr--bar { display: none !important; }
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar > .qr--buttons {
+  display: flex !important; flex-flow: row nowrap !important; flex: 0 0 auto !important;
+  width: 100% !important; min-width: 0 !important; max-width: 100% !important;
+  height: 42px !important; min-height: 42px !important; max-height: 42px !important;
+  overflow-x: auto !important; overflow-y: hidden !important; opacity: 1 !important;
+  visibility: visible !important; padding: 2px !important; gap: 5px !important;
+  border-bottom: 1px solid #dce1e7; scrollbar-width: thin; touch-action: pan-x;
+}
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #qr--bar > .qr--buttons > * {
+  flex: 0 0 auto !important; width: auto !important; max-width: none !important;
+  height: 32px !important; white-space: nowrap !important; padding: 3px 10px !important;
+}
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #send_form,
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #nonQRFormItems {
+  max-height: none !important; opacity: 1 !important; visibility: visible !important;
+  transform: none !important; min-width: 0 !important;
+}
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active #send_textarea { display: block !important; opacity: 1 !important; visibility: visible !important; }
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-compose-visible) #form_sheld { display: none !important; }
+@media(max-width:600px) {
+  #qn-controls { padding-inline: 4px; gap: 0; }
+  #qn-controls .qn-brand { display: none; }
+  #qn-controls button, #qn-controls summary { min-width: 40px; padding-inline: 8px; }
+  .qn-active #top-settings-holder .drawer { flex: 1 1 0; min-width: 0; }
+  .qn-active #top-settings-holder .drawer-icon { width: 100% !important; }
+}
