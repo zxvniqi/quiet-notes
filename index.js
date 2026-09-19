@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-controls';
   const KEY = 'quiet-notes.extension.v2';
-  const defaults = { enabled: false, top: false, compose: false, qr: false, avatars: false, media: false, embeds: true, names: false };
+  const defaults = { enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false };
   let state = { ...defaults };
   try {
     const saved = JSON.parse(window.localStorage.getItem(KEY) || '{}');
@@ -36,15 +36,18 @@
       return item;
     }
     const topButton = button('top', '도구', '상단 도구 열기/접기', () => { state.top = !state.top; apply(); });
-    const composeButton = button('compose', '입력', '하단 입력 바 전체 열기/접기', () => {
+    const composeButton = button('compose', '빠른 입력 ▾', '빠른 입력 열기/접기', () => {
       state.compose = !state.compose;
       apply();
       // Deliberately do not focus the textarea: avoid opening the phone keyboard.
     });
     const modeButton = button('mode', '일코 OFF', '일코 모드 켜기/끄기', () => { state.enabled = !state.enabled; apply(); });
-    const qrButton = button('qr', '빠른 작업', 'QR 분류 열기/접기', () => { state.qr = !state.qr; if(state.qr) state.compose = true; apply(); });
     modeButton.id = 'qn-mode-toggle';
-    bar.append(topButton, composeButton, qrButton, modeButton);
+    composeButton.id = 'qn-input-toggle';
+    composeButton.setAttribute('aria-controls', 'form_sheld');
+    const form = document.getElementById('form_sheld');
+    if (form) form.before(composeButton);
+    bar.append(topButton, modeButton);
     const details = document.createElement('details');
     details.id = 'qn-options';
     const summary = document.createElement('summary');
@@ -109,6 +112,7 @@
       abort.abort();
       titleObserver.disconnect();
       bar.remove();
+      composeButton.remove();
       state.enabled = false;
       updateFavicons();
       for (const cls of [...root.classList]) if (cls.startsWith('qn-')) root.classList.remove(cls);
@@ -120,13 +124,14 @@
     function apply() {
       root.classList.add('qn-installed');
       root.classList.toggle('qn-active', state.enabled);
-      for (const key of ['top', 'compose', 'qr', 'avatars', 'media', 'embeds', 'names']) {
+      for (const key of ['top', 'compose', 'avatars', 'media', 'embeds', 'names']) {
         root.classList.toggle('qn-' + key + '-visible', state[key]);
       }
       topButton.setAttribute('aria-expanded', String(!state.enabled || state.top));
       composeButton.setAttribute('aria-expanded', String(!state.enabled || state.compose));
-      topButton.disabled = composeButton.disabled = qrButton.disabled = !state.enabled;
-      qrButton.setAttribute('aria-expanded', String(state.enabled && state.compose && state.qr));
+      topButton.disabled = composeButton.disabled = !state.enabled;
+      composeButton.textContent = state.compose ? '빠른 입력 ▴' : '빠른 입력 ▾';
+      root.classList.toggle('qn-qr-visible', state.compose);
       modeButton.textContent = state.enabled ? '일코 ON' : '일코 OFF';
       modeButton.setAttribute('aria-pressed', String(state.enabled));
       for (const [key, input] of Object.entries(toggles)) input.checked = state[key];

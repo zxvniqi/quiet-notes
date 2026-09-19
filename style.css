@@ -280,3 +280,14 @@ html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-compose
   .qn-active #top-settings-holder .drawer { flex: 1 1 0; min-width: 0; }
   .qn-active #top-settings-holder .drawer-icon { width: 100% !important; }
 }
+/* A single bottom disclosure controls QR and the entire composer together. */
+#qn-input-toggle { display: none !important; }
+html.qn-active #qn-input-toggle {
+  display: block !important; flex: 0 0 40px !important; order: 0 !important;
+  width: 100% !important; min-height: 40px !important; margin: 0 !important;
+  padding: 7px 12px !important; border: 0 !important; border-top: 1px solid #dce1e7 !important;
+  border-radius: 0 !important; background: #f7f8fa !important; color: #506078 !important;
+  font: 500 13px/1.5 system-ui, sans-serif !important; text-shadow: none !important;
+  box-shadow: none !important; cursor: pointer; touch-action: manipulation;
+}
+html.qn-active #qn-input-toggle:focus-visible { outline: 2px solid #376d9e; outline-offset: -3px; }
