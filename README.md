@@ -31,10 +31,10 @@ https://github.com/zxvniqi/quiet-notes
 
 ### 터묵스에서 한 줄로 적용
 
-기본 설치 위치가 `~/SillyTavern`인 경우 다음을 그대로 복사합니다. 다른 위치에 설치했다면 마지막 경로만 실제 실리 폴더로 바꾸세요. 실리가 실행되는 터묵스에서 실행해야 합니다.
+실리가 실행되는 터묵스에서 다음을 그대로 복사합니다. 설치 경로를 입력할 필요가 없습니다. 현재 위치가 실리 폴더 안이면 그 설치를 사용하고, 아니면 홈 폴더에서 자동 검색합니다. 여러 개면 번호를 선택합니다.
 
 ```sh
-curl -fL https://raw.githubusercontent.com/zxvniqi/quiet-notes/main/startup-setup.cjs -o "$HOME/quiet-notes-startup.cjs" && node "$HOME/quiet-notes-startup.cjs" --root "$HOME/SillyTavern"
+curl -fL https://raw.githubusercontent.com/zxvniqi/quiet-notes/main/startup-setup.cjs -o "$HOME/quiet-notes-startup.cjs" && node "$HOME/quiet-notes-startup.cjs"
 ```
 
 Node.js는 실리 실행에 사용하던 것을 사용합니다. curl 명령이 없다면 먼저 `pkg install curl`을 실행하세요. 파일 하나에 필요한 CSS가 포함되어 있어, Quiet Notes 확장이 설치되어 있지 않아도 로딩 화면 교체만 따로 쓸 수 있습니다.
@@ -42,8 +42,10 @@ Node.js는 실리 실행에 사용하던 것을 사용합니다. curl 명령이 
 되돌리기:
 
 ```sh
-node "$HOME/quiet-notes-startup.cjs" --root "$HOME/SillyTavern" --remove
+node "$HOME/quiet-notes-startup.cjs" --remove
 ```
+
+자동 검색은 홈 폴더 아래 6단계까지 확인하며, node_modules·data·캐시·연결된 공용 저장소는 건너뜁니다. 홈 밖의 설치를 쓰는 경우 실리 폴더 안에서 위 명령을 실행하면 경로 입력 없이 적용할 수 있습니다. 되돌리기는 적용 흔적이 있는 설치를 우선 찾습니다. 여러 설치에 적용했다면 번호로 선택한 설치만 변경합니다.
 
 ### Windows 등 다른 서버
 

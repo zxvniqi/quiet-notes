@@ -1,13 +1,70 @@
 /* Run once on the SillyTavern server. No network, dependencies or core-file patches. */
 const fs = require('node:fs');
 const path = require('node:path');
+const os = require('node:os');
+const readline = require('node:readline');
 const args = process.argv.slice(2);
 const rootIndex = args.indexOf('--root');
-if (rootIndex < 0 || !args[rootIndex + 1]) {
-  console.error('Usage: node startup-setup.cjs --root "SillyTavern folder" [--remove]');
-  process.exit(1);
+function validRoot(folder) {
+  try {
+    const pkg = JSON.parse(fs.readFileSync(path.join(folder, 'package.json'), 'utf8'));
+    const html = fs.readFileSync(path.join(folder, 'public', 'index.html'), 'utf8');
+    return pkg.name.toLowerCase() === 'sillytavern' && /href=["']css\/user\.css["']/.test(html);
+  } catch { return false; }
 }
-const root = fs.realpathSync(args[rootIndex + 1]);
+async function findRoot() {
+  if (rootIndex >= 0) {
+    if (!args[rootIndex + 1] || args[rootIndex + 1].startsWith('--')) throw Error('--root 뒤에 설치 폴더가 필요합니다.');
+    const explicit = fs.realpathSync(args[rootIndex + 1]);
+    if (!validRoot(explicit)) throw Error('선택한 폴더는 SillyTavern 설치 폴더가 아닙니다.');
+    return explicit;
+  }
+  // Running from an installation or its subdirectory selects that installation.
+  let current = fs.realpathSync(process.cwd());
+  while (true) {
+    if (validRoot(current)) return current;
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+  console.log('홈 폴더에서 SillyTavern을 찾는 중…');
+  const candidates = [];
+  const skip = new Set(['node_modules', '.git', '.cache', '.npm', '.local', 'data', 'backups', 'cache', 'storage', 'Android']);
+  const queue = [{dir: os.homedir(), depth: 0}];
+  let visited = 0;
+  while (queue.length) {
+    if (++visited > 20000) throw Error('검색 범위가 너무 넓습니다. 실리 폴더 안에서 같은 명령을 실행하세요.');
+    const {dir, depth} = queue.shift();
+    if (validRoot(dir)) { candidates.push(fs.realpathSync(dir)); continue; }
+    if (depth >= 6) continue;
+    let entries;
+    try { entries = fs.readdirSync(dir, {withFileTypes: true}); } catch { continue; }
+    for (const entry of entries) {
+      if (entry.isDirectory() && !skip.has(entry.name) && !entry.name.startsWith('.')) queue.push({dir: path.join(dir, entry.name), depth: depth + 1});
+    }
+  }
+  let found = [...new Set(candidates)].sort();
+  if (args.includes('--remove')) {
+    const patched = found.filter(dir => {
+      try { return fs.readFileSync(path.join(dir, 'public', 'css', 'user.css'), 'utf8').includes('/* QUIET-NOTES STARTUP BEGIN */'); } catch { return false; }
+    });
+    if (patched.length) found = patched;
+  }
+  if (!found.length) throw Error('설치를 찾지 못했습니다. 실리 폴더 안에서 같은 명령을 실행하세요. 홈 밖이나 저장소 연결 경로는 자동 검색하지 않습니다.');
+  if (found.length === 1) return found[0];
+  console.log('설치가 여러 개 있습니다. 변경할 번호를 선택하세요.');
+  found.forEach((dir, i) => console.log(`${i + 1}. ${dir}`));
+  const rl = readline.createInterface({input: process.stdin, output: process.stdout});
+  const answer = await new Promise((resolve, reject) => {
+    rl.once('close', () => reject(Error('선택이 취소되었습니다. 변경하지 않았습니다.')));
+    rl.question('번호: ', value => { resolve(value.trim()); rl.close(); });
+  });
+  if (!/^\d+$/.test(answer) || !found[Number(answer) - 1]) throw Error('올바른 번호가 아닙니다. 변경하지 않았습니다.');
+  return found[Number(answer) - 1];
+}
+async function main() {
+const root = await findRoot();
+console.log(`선택한 설치: ${root}`);
 const htmlPath = path.join(root, 'public', 'index.html');
 const html = fs.readFileSync(htmlPath, 'utf8');
 if (!/href=["']css\/user\.css["']/.test(html)) throw Error('This folder does not contain the expected SillyTavern public/index.html.');
@@ -27,3 +84,5 @@ if (fs.existsSync(destination) && !fs.existsSync(backup)) fs.copyFileSync(destin
 fs.writeFileSync(destination, after, 'utf8');
 console.log(`${remove ? 'Removed' : 'Installed'} startup CSS: ${destination}`);
 console.log('Refresh SillyTavern. Other user.css rules were retained.');
+}
+main().catch(error => { console.error(error.message); process.exitCode = 1; });
