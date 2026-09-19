@@ -43,6 +43,14 @@
     });
     const modeButton = button('mode', '일코 OFF', '일코 모드 켜기/끄기', () => { state.enabled = !state.enabled; apply(); });
     modeButton.id = 'qn-mode-toggle';
+    const settingsHost = document.getElementById('extensions_settings2') || document.getElementById('extensions_settings');
+    const settingsPanel = document.createElement('details');
+    settingsPanel.id = 'qn-settings';
+    const settingsSummary = document.createElement('summary');
+    settingsSummary.textContent = 'Quiet Notes · 일코 모드';
+    const settingsToggle = button('settingsMode', '일코 모드 켜기', '설정에서 일코 모드 켜기/끄기', () => { state.enabled = !state.enabled; apply(); });
+    settingsPanel.append(settingsSummary, settingsToggle);
+    settingsHost?.append(settingsPanel);
     composeButton.id = 'qn-input-toggle';
     composeButton.setAttribute('aria-controls', 'form_sheld');
     bar.append(topButton, composeButton, modeButton);
@@ -109,6 +117,7 @@
       titleObserver.disconnect();
       bar.remove();
       composeButton.remove();
+      settingsPanel.remove();
       state.enabled = false;
       updateFavicons();
       for (const cls of [...root.classList]) if (cls.startsWith('qn-')) root.classList.remove(cls);
@@ -128,6 +137,8 @@
       topButton.disabled = composeButton.disabled = !state.enabled;
       modeButton.textContent = state.enabled ? '일코 ON' : '일코 OFF';
       modeButton.setAttribute('aria-pressed', String(state.enabled));
+      settingsToggle.textContent = state.enabled ? '일코 모드 끄기' : '일코 모드 켜기';
+      settingsToggle.setAttribute('aria-pressed', String(state.enabled));
       for (const [key, input] of Object.entries(toggles)) input.checked = state[key];
       titleUpdate();
       updateFavicons();
