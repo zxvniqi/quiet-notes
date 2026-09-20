@@ -284,32 +284,33 @@ html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active.qn-top-visible 
 html.qn-active #extensionTopBar > * { box-sizing: border-box !important; margin: 0 !important; }
 html.qn-active #extensionTopBar :is(input,select) { flex: 1 1 0 !important; width: 0 !important; min-width: 0 !important; max-width: none !important; padding-inline: 4px !important; text-overflow: ellipsis; }
 html.qn-active #extensionTopBar > i { display: inline-flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 clamp(23px, 6vw, 32px) !important; width: clamp(23px, 6vw, 32px) !important; min-width: 0 !important; height: 32px !important; min-height: 32px !important; padding: 0 !important; font-size: clamp(13px, 3.7vw, 18px) !important; }
-/* Preserve original action nodes and handlers; keep the edit shortcut like native ST. */
-.qn-actions-toggle { display: none !important; }
+/* Use the native action group as a floating panel; do not move or clone its buttons. */
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons {
-  display: flex !important; flex-wrap: wrap !important; align-items: flex-start !important;
-  position: relative; width: 100% !important; max-width: 100% !important; gap: 6px !important;
-  height: 36px !important; min-height: 36px !important; flex-shrink: 0 !important;
-  overflow: visible !important; align-content: flex-start !important;
+  position: relative !important; display: flex !important; align-items: center !important;
+  width: 100% !important; max-width: 100% !important; gap: 6px !important;
+  overflow: visible !important;
 }
-html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .qn-actions-toggle {
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtonsHint {
   display: inline-flex !important; align-items: center; justify-content: center;
-  min-width: 36px; min-height: 36px; margin: 0; padding: 0 6px; background: transparent;
-  border: 0; box-shadow: none; color: inherit; font: 600 22px/1 system-ui; cursor: pointer;
+  min-width: 28px; min-height: 28px; visibility: visible !important;
 }
-html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtonsHint { display: none !important; }
-html.qn-active.qn-actions-fold #chat .mes .mes_buttons > :not(.extraMesButtonsHint):not(.mes_edit):not(.qn-actions-toggle) {
-  transition: opacity 180ms ease, transform 180ms ease, display 180ms allow-discrete;
-  opacity: 1; transform: translateY(0);
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .extraMesButtonsHint { visibility: hidden !important; }
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtons {
+  position: absolute !important; inset: 100% auto auto 0 !important;
+  display: flex !important; flex-wrap: wrap !important; align-items: center !important;
+  box-sizing: border-box !important; width: max-content !important; max-width: 100% !important;
+  min-width: 0 !important; height: auto !important; max-height: min(40vh, 240px) !important;
+  gap: 8px !important; padding: 10px !important; margin: 4px 0 0 !important;
+  background: #fff !important; border: 1px solid #dce1e7; border-radius: 8px;
+  box-shadow: 0 5px 18px #27313f18; z-index: 20;
+  overflow: auto !important; opacity: 0 !important; visibility: hidden !important;
+  pointer-events: none !important; transform: translateY(-4px);
+  transition: opacity 160ms ease, transform 160ms ease, visibility 160ms !important;
 }
-html.qn-active.qn-actions-fold #chat .mes .mes_buttons:not(.qn-actions-open) > :not(.qn-actions-toggle):not(.mes_edit) { display: none !important; opacity: 0 !important; transform: translateY(-4px); pointer-events: none; }
-html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .qn-actions-toggle { display: none !important; }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .extraMesButtons {
-  display: flex !important; flex-wrap: wrap !important; opacity: 1 !important; visibility: visible !important;
-}
-@starting-style {
-  html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > :not(.qn-actions-toggle):not(.mes_edit) { opacity: 0 !important; transform: translateY(-4px); }
+  opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;
+  transform: translateY(0);
 }
 @media (prefers-reduced-motion: reduce) {
-  html.qn-active.qn-actions-fold #chat .mes .mes_buttons > * { transition: none !important; }
+  html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtons { transition: none !important; }
 }

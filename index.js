@@ -129,29 +129,16 @@
     function closeActions() {
       if (!openActions) return;
       openActions.classList.remove('qn-actions-open');
-      openActions.querySelector('.qn-actions-toggle')?.setAttribute('aria-expanded', 'false');
+      openActions.querySelector('.extraMesButtonsHint')?.setAttribute('aria-expanded', 'false');
       openActions = null;
     }
-    function addActionToggle(actions) {
-      if (actions.querySelector(':scope > .qn-actions-toggle')) return;
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'qn-actions-toggle';
-      toggle.textContent = '···';
-      toggle.setAttribute('aria-label', '메시지 작업 펼치기/접기');
-      toggle.setAttribute('aria-expanded', 'false');
-      actions.prepend(toggle);
-    }
     const chat = document.getElementById('chat');
-    chat?.querySelectorAll('.mes .mes_buttons').forEach(addActionToggle);
     const actionsObserver = new MutationObserver(records => {
       for (const record of records) {
         const name = (record.target.nodeType === Node.TEXT_NODE ? record.target.parentElement : record.target)?.closest?.('.name_text');
         if (name) updateName(name);
         for (const node of record.addedNodes) {
           if (!(node instanceof Element)) continue;
-          if (node.matches('.mes_buttons')) addActionToggle(node);
-          else node.querySelectorAll('.mes_buttons').forEach(addActionToggle);
           if (node.matches('.name_text')) updateName(node);
           else node.querySelectorAll('.name_text').forEach(updateName);
         }
@@ -159,8 +146,9 @@
     });
     if (chat) actionsObserver.observe(chat, {childList: true, subtree: true, characterData: true});
     document.addEventListener('click', e => {
-      const toggle = e.target.closest?.('.qn-actions-toggle');
+      const toggle = e.target.closest?.('.extraMesButtonsHint');
       if (!toggle || !state.enabled || !state.actions) return;
+      e.stopPropagation(); // Use the native trigger without also running its expand handler.
       const actions = toggle.closest('.mes_buttons');
       const wasOpen = actions === openActions;
       closeActions();
@@ -169,7 +157,7 @@
         actions.classList.add('qn-actions-open');
         toggle.setAttribute('aria-expanded', 'true');
       }
-    }, {signal: abort.signal});
+    }, {capture: true, signal: abort.signal});
     document.addEventListener('pointerdown', e => {
       if (openActions && !openActions.contains(e.target)) closeActions();
     }, {signal: abort.signal});
@@ -215,7 +203,6 @@
       wandObserver.disconnect();
       actionsObserver.disconnect();
       closeActions();
-      chat?.querySelectorAll('.qn-actions-toggle').forEach(node => node.remove());
       bar.remove();
       wandContainer.remove();
       composeButton.remove();
