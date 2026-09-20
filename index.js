@@ -43,10 +43,17 @@
     });
     const modeButton = button('mode', '일코 OFF', '일코 모드 켜기/끄기', () => { state.enabled = !state.enabled; apply(); });
     modeButton.id = 'qn-mode-toggle';
-    const wandToggle = button('wandMode', '일코 모드 켜기', '마법봉 메뉴에서 일코 모드 켜기/끄기', () => { state.enabled = !state.enabled; apply(); });
+    const wandToggle = document.createElement('div');
+    wandToggle.setAttribute('role', 'button');
+    wandToggle.tabIndex = 0;
+    wandToggle.title = '일코 모드 켜기/끄기';
+    wandToggle.addEventListener('click', () => { state.enabled = !state.enabled; apply(); });
+    wandToggle.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); wandToggle.click(); }
+    });
     wandToggle.id = 'qn-wand-toggle';
     wandToggle.className = 'list-group-item flex-container flexGap5';
-    const wandIcon = document.createElement('i');
+    const wandIcon = document.createElement('div');
     wandIcon.className = 'extensionsMenuExtensionButton fa-fw fa-solid fa-file-lines';
     wandIcon.setAttribute('aria-hidden', 'true');
     const wandLabel = document.createElement('span');

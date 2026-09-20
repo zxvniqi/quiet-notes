@@ -269,8 +269,6 @@ html.qn-active.qn-active.qn-active #send_form #send_textarea {
 }
 /* OFF is available in the native wand menu, without a floating button or spacer. */
 html.qn-installed:not(.qn-active) #qn-controls { display: none !important; }
-#extensionsMenu #qn-wand-toggle { display: flex; align-items: center; gap: 5px; min-height: 40px; width: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--SmartThemeBodyColor); font: inherit; text-align: left; cursor: pointer; }
-#qn-wand-toggle > .extensionsMenuExtensionButton { flex-shrink: 0; }
 /* Flexible text fields leave room for all seven action icons without scrolling. */
 html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active.qn-top-visible #extensionTopBar {
   display: flex !important; position: relative !important; inset: auto !important;
@@ -289,8 +287,10 @@ html.qn-active #extensionTopBar > i { display: inline-flex !important; align-ite
 /* Preserve original action nodes and handlers; keep the edit shortcut like native ST. */
 .qn-actions-toggle { display: none !important; }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons {
-  display: flex !important; flex-wrap: wrap !important; align-items: center !important;
-  width: auto !important; max-width: 100% !important; gap: 6px !important;
+  display: flex !important; flex-wrap: wrap !important; align-items: flex-start !important;
+  position: relative; width: 100% !important; max-width: 100% !important; gap: 6px !important;
+  height: 36px !important; min-height: 36px !important; flex-shrink: 0 !important;
+  overflow: visible !important; align-content: flex-start !important;
 }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .qn-actions-toggle {
   display: inline-flex !important; align-items: center; justify-content: center;
@@ -298,18 +298,17 @@ html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .qn-actions-toggle {
   border: 0; box-shadow: none; color: inherit; font: 600 22px/1 system-ui; cursor: pointer;
 }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtonsHint { display: none !important; }
-html.qn-active.qn-actions-fold #chat .mes .mes_buttons > :not(.extraMesButtonsHint):not(.mes_edit) {
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons > :not(.extraMesButtonsHint):not(.mes_edit):not(.qn-actions-toggle) {
   transition: opacity 180ms ease, transform 180ms ease, display 180ms allow-discrete;
   opacity: 1; transform: translateY(0);
 }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons:not(.qn-actions-open) > :not(.qn-actions-toggle):not(.mes_edit) { display: none !important; opacity: 0 !important; transform: translateY(-4px); pointer-events: none; }
-html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .qn-actions-toggle { display: none !important; opacity: 0; }
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .qn-actions-toggle { display: none !important; }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .extraMesButtons {
   display: flex !important; flex-wrap: wrap !important; opacity: 1 !important; visibility: visible !important;
 }
 @starting-style {
   html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > :not(.qn-actions-toggle):not(.mes_edit) { opacity: 0 !important; transform: translateY(-4px); }
-  html.qn-active.qn-actions-fold #chat .mes .mes_buttons:not(.qn-actions-open) > .qn-actions-toggle { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   html.qn-active.qn-actions-fold #chat .mes .mes_buttons > * { transition: none !important; }
