@@ -46,6 +46,11 @@
     const wandToggle = button('wandMode', '일코 모드 켜기', '마법봉 메뉴에서 일코 모드 켜기/끄기', () => { state.enabled = !state.enabled; apply(); });
     wandToggle.id = 'qn-wand-toggle';
     wandToggle.className = 'list-group-item flex-container flexGap5';
+    const wandIcon = document.createElement('i');
+    wandIcon.className = 'extensionsMenuExtensionButton fa-fw fa-solid fa-file-lines';
+    wandIcon.setAttribute('aria-hidden', 'true');
+    const wandLabel = document.createElement('span');
+    wandToggle.replaceChildren(wandIcon, wandLabel);
     const wandContainer = document.createElement('div');
     wandContainer.id = 'qn-wand-container';
     wandContainer.className = 'extension_container';
@@ -94,6 +99,26 @@
     bar.append(details);
     document.body.append(bar);
     let openActions = null;
+    // Change text nodes only: keep the theme's typography, decoration and DOM intact.
+    const nameText = new WeakMap();
+    function updateName(name) {
+      const hidden = state.enabled && !state.names;
+      let labelled = false;
+      for (const node of name.childNodes) {
+        if (node.nodeType !== Node.TEXT_NODE) continue;
+        let saved = nameText.get(node);
+        if (!saved) saved = { original: node.data, last: node.data };
+        if (node.data !== saved.last) saved.original = node.data;
+        let text = saved.original;
+        if (hidden && text.trim()) {
+          text = labelled ? '' : name.closest('.mes')?.getAttribute('is_user') === 'true' ? '작성' : '메모';
+          labelled = true;
+        }
+        saved.last = text;
+        nameText.set(node, saved);
+        if (node.data !== text) node.data = text;
+      }
+    }
     function closeActions() {
       if (!openActions) return;
       openActions.classList.remove('qn-actions-open');
@@ -113,13 +138,19 @@
     const chat = document.getElementById('chat');
     chat?.querySelectorAll('.mes .mes_buttons').forEach(addActionToggle);
     const actionsObserver = new MutationObserver(records => {
-      for (const record of records) for (const node of record.addedNodes) {
-        if (!(node instanceof Element)) continue;
-        if (node.matches('.mes_buttons')) addActionToggle(node);
-        else node.querySelectorAll('.mes_buttons').forEach(addActionToggle);
+      for (const record of records) {
+        const name = (record.target.nodeType === Node.TEXT_NODE ? record.target.parentElement : record.target)?.closest?.('.name_text');
+        if (name) updateName(name);
+        for (const node of record.addedNodes) {
+          if (!(node instanceof Element)) continue;
+          if (node.matches('.mes_buttons')) addActionToggle(node);
+          else node.querySelectorAll('.mes_buttons').forEach(addActionToggle);
+          if (node.matches('.name_text')) updateName(node);
+          else node.querySelectorAll('.name_text').forEach(updateName);
+        }
       }
     });
-    if (chat) actionsObserver.observe(chat, {childList: true, subtree: true});
+    if (chat) actionsObserver.observe(chat, {childList: true, subtree: true, characterData: true});
     document.addEventListener('click', e => {
       const toggle = e.target.closest?.('.qn-actions-toggle');
       if (!toggle || !state.enabled || !state.actions) return;
@@ -183,6 +214,7 @@
       composeButton.remove();
       settingsPanel.remove();
       state.enabled = false;
+      chat?.querySelectorAll('.name_text').forEach(updateName);
       updateFavicons();
       for (const cls of [...root.classList]) if (cls.startsWith('qn-')) root.classList.remove(cls);
       document.getElementById('qn-helper-style')?.remove();
@@ -194,8 +226,9 @@
       root.classList.add('qn-installed');
       root.classList.toggle('qn-active', state.enabled);
       root.classList.toggle('qn-actions-fold', state.enabled && state.actions);
+      chat?.querySelectorAll('.name_text').forEach(updateName);
       if (!state.enabled || !state.actions) closeActions();
-      for (const key of ['top', 'compose', 'avatars', 'media', 'embeds', 'names']) {
+      for (const key of ['top', 'compose', 'avatars', 'media', 'embeds']) {
         root.classList.toggle('qn-' + key + '-visible', state[key]);
       }
       topButton.setAttribute('aria-expanded', String(!state.enabled || state.top));
@@ -203,7 +236,7 @@
       topButton.disabled = composeButton.disabled = !state.enabled;
       modeButton.textContent = state.enabled ? '일코 ON' : '일코 OFF';
       modeButton.setAttribute('aria-pressed', String(state.enabled));
-      wandToggle.textContent = state.enabled ? '일코 모드 끄기' : '일코 모드 켜기';
+      wandLabel.textContent = state.enabled ? '일코 모드 끄기' : '일코 모드 켜기';
       wandToggle.setAttribute('aria-pressed', String(state.enabled));
       settingsToggle.textContent = state.enabled ? '일코 모드 끄기' : '일코 모드 켜기';
       settingsToggle.setAttribute('aria-pressed', String(state.enabled));
