@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-controls';
   const KEY = 'quiet-notes.extension.v2';
-  const defaults = { enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, actions: true };
+  const defaults = { enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, actions: true, reader: false };
   let state = { ...defaults };
   try {
     const saved = JSON.parse(window.localStorage.getItem(KEY) || '{}');
@@ -22,7 +22,7 @@
     bar.setAttribute('aria-label', '화면 표시');
     const brand = document.createElement('span');
     brand.className = 'qn-brand';
-    brand.textContent = '메모';
+    brand.textContent = 'Note';
     bar.append(brand);
     const buttons = {};
     function button(key, text, description, handler) {
@@ -92,7 +92,7 @@
     for (const [key, text] of [
       ['avatars', '프로필 사진 표시'], ['media', '본문 이미지·에셋 표시'],
       ['embeds', '임베드 패널 표시'], ['names', '대화 이름 표시'],
-      ['actions', '메시지 작업 버튼 접기'],
+      ['actions', '메시지 작업 버튼 접기'], ['reader', '일코 버전 · 노트/전자책'],
     ]) {
       const label = document.createElement('label');
       const input = document.createElement('input');
@@ -133,6 +133,20 @@
       openActions = null;
     }
     const chat = document.getElementById('chat');
+    let blueWasOn = document.body.classList.contains('salty');
+    let adjustingBlue = false;
+    function syncBlue() {
+      const blueEnabled = window.Salty?.getSettings?.()?.enabled;
+      if (typeof blueEnabled === 'boolean') blueWasOn = blueEnabled;
+      else if (!state.enabled && document.body.classList.contains('salty')) blueWasOn = true;
+      const showBlue = blueWasOn && !state.enabled;
+      if (document.body.classList.contains('salty') === showBlue) return;
+      adjustingBlue = true;
+      document.body.classList.toggle('salty', showBlue);
+      adjustingBlue = false;
+    }
+    const blueObserver = new MutationObserver(() => { if (!adjustingBlue) syncBlue(); });
+    blueObserver.observe(document.body, {attributes: true, attributeFilter: ['class']});
     const actionsObserver = new MutationObserver(records => {
       for (const record of records) {
         const name = (record.target.nodeType === Node.TEXT_NODE ? record.target.parentElement : record.target)?.closest?.('.name_text');
@@ -202,12 +216,14 @@
       titleObserver.disconnect();
       wandObserver.disconnect();
       actionsObserver.disconnect();
+      blueObserver.disconnect();
       closeActions();
       bar.remove();
       wandContainer.remove();
       composeButton.remove();
       settingsPanel.remove();
       state.enabled = false;
+      syncBlue();
       chat?.querySelectorAll('.name_text').forEach(updateName);
       updateFavicons();
       for (const cls of [...root.classList]) if (cls.startsWith('qn-')) root.classList.remove(cls);
@@ -220,6 +236,8 @@
       root.classList.add('qn-installed');
       root.classList.toggle('qn-active', state.enabled);
       root.classList.toggle('qn-actions-fold', state.enabled && state.actions);
+      root.classList.toggle('qn-reader', state.enabled && state.reader);
+      syncBlue();
       chat?.querySelectorAll('.name_text').forEach(updateName);
       if (!state.enabled || !state.actions) closeActions();
       for (const key of ['top', 'compose', 'avatars', 'media', 'embeds']) {
