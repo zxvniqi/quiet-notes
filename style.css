@@ -211,10 +211,6 @@
 }
 #qn-controls .qn-panel label { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
 #qn-controls .qn-panel input { width: 18px; height: 18px; accent-color: #506b87; }
-/* Keep one unobtrusive recovery control when the theme is switched off. */
-.qn-installed:not(.qn-active) #qn-controls { top: auto; bottom: 8px; left: auto; width: auto; border: 1px solid #dce1e7; border-radius: 8px; padding: 0 4px; }
-.qn-installed:not(.qn-active) #qn-controls > :not(#qn-mode-toggle) { display: none; }
-.qn-installed:not(.qn-active) #qn-controls .qn-panel { top: auto; bottom: calc(100% + 6px); }
 @media (max-width: 600px) {
   .qn-active #sheld { border-inline: 0; }
   .qn-active #chat .mes { padding: 18px 16px !important; }
@@ -263,7 +259,7 @@ html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active:not(.qn-compose
 
 /* Hide the repository owner badge in this extension row only, in both modes. */
 .extension_block[data-name="/quiet-notes"] .extension_author { display: none !important; }
-/* Keep the recovery control reachable above floating extension buttons. */
+/* Keep the active mode toolbar reachable. */
 html.qn-installed #qn-controls {
   position: fixed !important; display: flex !important; visibility: visible !important;
   opacity: 1 !important; z-index: 2147483000 !important; transform: none !important;
@@ -273,35 +269,54 @@ html.qn-installed #qn-controls #qn-mode-toggle {
   display: inline-flex !important; visibility: visible !important; opacity: 1 !important;
   min-height: 44px !important; min-width: 76px !important; flex: 0 0 auto;
 }
-/* OFF has a dedicated flow row outside the original composer and QR. */
-#qn-mode-dock { display: none !important; }
-html.qn-installed:not(.qn-active) #qn-mode-dock {
-  display: flex !important; position: relative !important; flex: 0 0 auto !important;
-  width: 100% !important; min-width: 0 !important; order: 0; box-sizing: border-box;
-  padding: 3px 8px !important; margin: 0 !important; overflow: visible !important;
-  border-top: 1px solid var(--SmartThemeBorderColor, #ccd2da);
-  background: var(--SmartThemeBlurTintColor, #f7f8fa);
-}
-html.qn-installed:not(.qn-active) #qn-mode-dock #qn-controls {
-  position: static !important; inset: auto !important; transform: none !important;
-  width: 100% !important; max-width: 100% !important; min-height: 44px !important;
-  height: auto !important; margin: 0 !important; padding: 0 !important;
-  justify-content: flex-end !important; border: 0 !important; border-radius: 0 !important;
-  background: transparent !important; box-shadow: none !important; z-index: auto !important;
-}
-html.qn-installed:not(.qn-active) #qn-mode-dock #qn-mode-toggle {
-  border: 1px solid #c8d0da !important; background: #fafbfc !important;
-  border-radius: 7px !important; margin: 0 !important;
-}
 #qn-settings { margin-block: 8px; padding: 8px; border: 1px solid var(--SmartThemeBorderColor, #ccd2da); border-radius: 8px; }
 #qn-settings > summary { cursor: pointer; padding: 8px 0; font-weight: 600; }
 #qn-settings > button { display: block !important; width: 100%; min-height: 44px; margin-block: 8px; cursor: pointer; }
 /* Chat Lobby closes its container independently of the overlay. Match both. */
-html:has(#chat-lobby-overlay[style*="display: flex"] #chat-lobby-container:not([style*="display: none"])) #qn-controls,
-html:has(#chat-lobby-overlay[style*="display: flex"] #chat-lobby-container:not([style*="display: none"])) #qn-mode-dock {
+html:has(#chat-lobby-overlay[style*="display: flex"] #chat-lobby-container:not([style*="display: none"])) #qn-controls {
   display: none !important;
 }
 html.qn-active.qn-active.qn-active #send_form #send_textarea {
   background: transparent !important; border: 0 !important; border-radius: 0 !important;
   box-shadow: none !important;
+}
+/* OFF is available in the native wand menu, without a floating button or spacer. */
+html.qn-installed:not(.qn-active) #qn-controls { display: none !important; }
+#qn-wand-toggle { min-height: 40px; width: 100%; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+/* Keep every Chat Top Bar control on one horizontally scrollable row. */
+html.qn-active.qn-active.qn-active.qn-active.qn-active.qn-active.qn-top-visible #extensionTopBar {
+  flex-wrap: nowrap !important; overflow-x: auto !important; overflow-y: hidden !important;
+  box-sizing: border-box !important; max-width: 100% !important;
+  scrollbar-width: thin; white-space: nowrap !important; min-height: 42px !important;
+}
+html.qn-active #extensionTopBar > * { flex-shrink: 0 !important; }
+html.qn-active #extensionTopBar :is(input,select) { flex: 0 0 140px !important; width: 140px !important; min-width: 100px !important; }
+/* Cinema Note positions name ::after absolutely as a highlight; reset that decoration. */
+html.qn-active.qn-active.qn-active:not(.qn-names-visible) #chat .ch_name .name_text {
+  font-size: 0 !important; width: auto !important; min-width: max-content !important;
+  max-width: none !important; white-space: nowrap !important; writing-mode: horizontal-tb !important;
+  word-break: keep-all !important; overflow-wrap: normal !important; flex: 0 0 auto !important;
+}
+html.qn-active.qn-active.qn-active:not(.qn-names-visible) #chat .ch_name .name_text::after {
+  position: static !important; display: inline-block !important; inset: auto !important;
+  width: auto !important; height: auto !important; min-width: 2em !important;
+  font-size: 13px !important; line-height: 1.5 !important; white-space: nowrap !important;
+  writing-mode: horizontal-tb !important; background: none !important; opacity: 1 !important;
+  transform: none !important; z-index: auto !important;
+}
+/* Preserve original action nodes and handlers; keep the edit shortcut like native ST. */
+.qn-actions-toggle { display: none !important; }
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons {
+  display: flex !important; flex-wrap: wrap !important; align-items: center !important;
+  width: auto !important; max-width: 100% !important; gap: 6px !important;
+}
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .qn-actions-toggle {
+  display: inline-flex !important; align-items: center; justify-content: center;
+  min-width: 36px; min-height: 36px; margin: 0; padding: 0 6px; background: transparent;
+  border: 0; box-shadow: none; color: inherit; font: 600 22px/1 system-ui; cursor: pointer;
+}
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtonsHint { display: none !important; }
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons:not(.qn-actions-open) > :not(.qn-actions-toggle):not(.mes_edit) { display: none !important; }
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .extraMesButtons {
+  display: flex !important; flex-wrap: wrap !important; opacity: 1 !important; visibility: visible !important;
 }
