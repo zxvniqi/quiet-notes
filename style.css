@@ -1,5 +1,5 @@
-@import url('./icons.css?v=1.0.0');
-:root { --qn-css: "1.0.0"; }
+@import url('./icons.css?v=1.0.1');
+:root { --qn-css: "1.0.1"; }
 /* Quiet Notes. Scoped to qn-active; disabling restores the existing theme.
    No font-family is set anywhere: the theme's own fonts are kept. */
 
@@ -775,3 +775,10 @@ html.qn-active #sheld#sheld#sheld #chat .mes .mes_block > :not(.mes_text):not(.c
 }
 /* The e-book "line" divider must outweigh the clean sheet's see-through borders. */
 html.qn-active[data-qn-divider="line"] #sheld#sheld#sheld #chat .mes:not(.last_mes):not(:last-child) { border-bottom: 1px solid var(--qn-div) !important; }
+/* Hidden avatars leave nothing behind: the favourites strip drops its pictures entirely, and other
+   avatar spots lose the frames and ornaments themes draw around the (invisible) picture. */
+html.qn-active:not(.qn-avatars-visible) #HotSwapWrapper .hotswap > .avatar { display: none !important; }
+html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container) { border-color: transparent !important; box-shadow: none !important; outline: 0 !important; background-image: none !important; }
+html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container) img { border-color: transparent !important; box-shadow: none !important; outline: 0 !important; }
+html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container)::before,
+html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container)::after { content: none !important; display: none !important; }
