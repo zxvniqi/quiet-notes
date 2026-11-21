@@ -1,5 +1,5 @@
-@import url('./icons.css?v=1.0.1');
-:root { --qn-css: "1.0.1"; }
+@import url('./icons.css?v=1.0.0');
+:root { --qn-css: "1.0.0"; }
 /* Quiet Notes. Scoped to qn-active; disabling restores the existing theme.
    No font-family is set anywhere: the theme's own fonts are kept. */
 
