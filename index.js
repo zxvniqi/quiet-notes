@@ -432,12 +432,21 @@
       const chatBar = state.reader ? null : document.getElementById('extensionTopBar');
       if (chatBar && !open) chatBarHeight = chatBar.offsetHeight;
       const holder = document.getElementById('top-settings-holder');
-      const shift = state.reader ? 52 : (holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
-      const away = '0 -100%';
-      if (open && chatBar) chatBar.style.setProperty('visibility', 'visible', 'important');
-      const frames = open ? [{ translate: away, opacity: 0 }, { translate: '0 0', opacity: 1 }] : [{ translate: '0 0', opacity: 1 }, { translate: away, opacity: 0 }];
+      const shift = state.reader ? readerBar.offsetHeight || 52 :(holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
+      if (open && chatBar) {
+        chatBar.style.setProperty('visibility', 'visible', 'important');
+        if (chatBarHeight) chatBar.style.setProperty('min-height', `${chatBarHeight}px`);
+      }
+      // The bars move as one block, all by the same distance. Opening, the Chat Top Bar starts from
+      // where it waits while folded and ends right under the settings bar, its place in the page.
+      const offset = bar => bar === chatBar && open ? (holder?.offsetHeight || 0) - chatBar.getBoundingClientRect().top : 0;
+      const frames = bar => {
+        const at = offset(bar);
+        const shown = `0 ${at}px`, away = `0 ${at - shift}px`;
+        return open ? [{ translate: away }, { translate: shown }] : [{ translate: shown }, { translate: away }];
+      };
       const timing = { duration: FOLD_MS, easing: FOLD_EASE, fill: 'forwards' };
-      const slides = bars.map(bar => bar.animate(frames, timing));
+      const slides = bars.map(bar => bar.animate(frames(bar), timing));
       if (topEdge.isConnected) slides.push(topEdge.animate([{ translate: '0 0' }, { translate: `0 ${open ? shift : -shift}px` }], timing));
       folding = true;
       let done = false;
@@ -456,6 +465,7 @@
         if (heldAnchor && !heldAnchor.bottom) { heldAnchor.offset -= moved; heldAnchor.textOffset -= moved; }
         for (const slide of slides) slide.cancel();
         chatBar?.style.removeProperty('visibility');
+        chatBar?.style.removeProperty('min-height');
         folding = false;
       };
       // Animations pause while the page is hidden: the bar still settles on time.
