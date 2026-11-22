@@ -397,11 +397,9 @@
       }
     };
     for (const type of ['click', 'mousedown', 'mouseup', 'touchend', 'pointerup', 'contextmenu']) document.addEventListener(type, guard, { capture: true, signal: abort.signal });
-    // Folding a bar: the page settles into its new layout at once, and everything that moved
-    // (the bars, the grip lines and the text) glides there together on the same curve. Only
-    // positions animate (the `translate` property, which theme `transform` rules don't touch),
-    // so a long chat isn't laid out again on every frame. A bar that folds away stays on screen
-    // just long enough to slide out (qn-*-leaving), without taking space any more.
+    // Folding a bar slides it (and the grip lines) instead of snapping. Only positions animate (the
+    // `translate` property, which theme `transform` rules don't touch), so a long chat isn't laid
+    // out again on every frame. The top bar has its own path (foldTop); the composer's is animateFold.
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
     const FOLD_MS = 240;
     const FOLD_EASE = 'cubic-bezier(.2, .8, .2, 1)';
@@ -509,11 +507,14 @@
       Promise.all(slides.map(slide => slide.finished.catch(() => {}))).then(finish);
       setTimeout(finish, FOLD_MS + 80);
     }
+    // The composer: the page settles into its new layout at once, and everything that moved (the bar,
+    // the grip lines and the text) glides there together. Folding, the bar stays on screen just long
+    // enough to slide out (qn-compose-leaving), without taking space any more.
     function animateFold(kind, open, commit) {
       if (!state.enabled || reducedMotion?.matches || typeof Element.prototype.animate !== 'function') { commit(); return; }
       if (kind === 'top') { foldTop(open, commit); return; }
-      const away = kind === 'top' ? '0 -100%' : '0 100%';
-      const leaving = kind === 'top' ? 'qn-top-leaving' : 'qn-compose-leaving';
+      const away = '0 100%';
+      const leaving = 'qn-compose-leaving';
       const lines = [topEdge, bottomEdge].filter(node => node.isConnected);
       const linesBefore = lines.map(node => node.getBoundingClientRect().top);
       const chatTop = chat ? chat.getBoundingClientRect().top : 0;
@@ -523,8 +524,7 @@
       commit();
       if (chat) {
         const chatTopNow = chat.getBoundingClientRect().top;
-        if (kind === 'top') chat.scrollTop = scrolled + (chatTopNow - chatTop);
-        else if (atEnd) chat.scrollTop = chat.scrollHeight;
+        if (atEnd) chat.scrollTop = chat.scrollHeight;
         glide(chat, (chatTop - scrolled) - (chatTopNow - chat.scrollTop));
       }
       lines.forEach((node, i) => glide(node, linesBefore[i] - node.getBoundingClientRect().top));
