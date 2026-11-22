@@ -109,7 +109,7 @@ async function ask(title, names, flag, fallback) {
     rl.once('close', () => reject(Error('선택이 취소되었습니다. 변경하지 않았습니다.')));
     rl.question('번호: ', value => { resolve(value.trim()); rl.close(); });
   });
-  if (!/^d+$/.test(answer) || !keys[Number(answer) - 1]) throw Error('올바른 번호가 아닙니다. 변경하지 않았습니다.');
+  if (!/^\d+$/.test(answer) || !keys[Number(answer) - 1]) throw Error('올바른 번호가 아닙니다. 변경하지 않았습니다.');
   return keys[Number(answer) - 1];
 }
 async function main() {
