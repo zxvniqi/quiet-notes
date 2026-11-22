@@ -553,14 +553,8 @@ html.qn-active.qn-active:not(.qn-compose-visible) #form_sheld#form_sheld {
   opacity: 0 !important; pointer-events: none !important; animation: none !important;
 }
 html.qn-active.qn-active:not(.qn-compose-visible) #sheld#sheld#sheld { overflow: hidden !important; }
-html.qn-active.qn-top-visible:not(.qn-reader) :is(#top-settings-holder, #extensionTopBar),
-html.qn-active.qn-reader.qn-top-visible #qn-reader-bar { animation: qn-in-top .15s ease-out; }
-html.qn-active.qn-compose-visible #form_sheld { animation: qn-in-bottom .15s ease-out; }
-@keyframes qn-in-top { from { opacity: 0; translate: 0 -6px; } }
-@keyframes qn-in-bottom { from { opacity: 0; translate: 0 6px; } }
-@media (prefers-reduced-motion: reduce) {
-  html.qn-active :is(#top-settings-holder, #qn-reader-bar, #extensionTopBar, #form_sheld) { animation: none !important; }
-}
+/* Bars slide in and out from the script (Web Animations on translate); while one folds, the page clips it. */
+html.qn-active.qn-folding #sheld#sheld#sheld { overflow: hidden !important; }
 /* The composer and its popups (e.g. Direction Manager) stay above the edge grips. */
 html.qn-active #form_sheld { z-index: 2001; }
 html.qn-active.qn-compose-visible #form_sheld { position: relative; }

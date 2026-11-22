@@ -395,11 +395,66 @@
       }
     };
     for (const type of ['click', 'mousedown', 'mouseup', 'touchend', 'pointerup', 'contextmenu']) document.addEventListener(type, guard, { capture: true, signal: abort.signal });
+    // Folding a bar slides it out of / into view and moves the page text along with it.
+    // Only positions animate (the `translate` property, which theme `transform` rules don't touch),
+    // so a long chat isn't re-laid out on every frame. Closing slides first, then the page settles;
+    // opening settles the page first, then the bar and the text glide into their new places.
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    let folding = false;
+    function readingPoint() {
+      if (!chat) return null;
+      const box = chat.getBoundingClientRect();
+      const hit = document.elementsFromPoint(box.left + box.width / 2, box.top + Math.min(box.height * 0.4, 240))
+        .find(node => node.closest?.('#chat .mes'));
+      const el = hit?.closest('#chat .mes_text p, #chat .mes_text, #chat .mes') || null;
+      return el ? { el, top: el.getBoundingClientRect().top } : null;
+    }
+    function foldBars(kind) {
+      if (kind === 'bottom') return [document.getElementById('form_sheld')].filter(Boolean);
+      return (state.reader ? [readerBar] : [document.getElementById('top-settings-holder'), document.getElementById('extensionTopBar')]).filter(Boolean);
+    }
+    function animateFold(kind, open, commit) {
+      if (!state.enabled || reducedMotion?.matches || typeof Element.prototype.animate !== 'function') { commit(); return; }
+      const away = kind === 'top' ? '0 -100%' : '0 100%';
+      const ease = 'cubic-bezier(.22, .8, .3, 1)';
+      const point = readingPoint();
+      const glideText = () => {
+        if (!point?.el.isConnected) return;
+        const shift = point.top - point.el.getBoundingClientRect().top;
+        if (Math.abs(shift) > 1) chat.animate([{ translate: `0 ${shift}px` }, { translate: '0 0' }], { duration: 240, easing: ease });
+      };
+      if (open) {
+        commit();
+        glideText();
+        for (const bar of foldBars(kind)) bar.animate([{ translate: away, opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 260, easing: ease });
+        return;
+      }
+      folding = true;
+      root.classList.add('qn-folding');
+      const slides = foldBars(kind).map(bar => bar.animate([{ translate: '0 0', opacity: 1 }, { translate: away, opacity: 0 }], { duration: 200, easing: 'cubic-bezier(.4, 0, .9, .6)', fill: 'forwards' }));
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        commit();
+        for (const slide of slides) slide.cancel();
+        root.classList.remove('qn-folding');
+        folding = false;
+        glideText();
+      };
+      // Animations pause while the page is hidden: the bar still folds on time.
+      Promise.all(slides.map(slide => slide.finished.catch(() => {}))).then(finish);
+      setTimeout(finish, 260);
+    }
     function edge(kind) {
       const grip = el('div', { className: 'qn-edge-grip', tabIndex: 0, title: kind === 'top' ? '상단 도구 열기·닫기' : '입력 바 열기·닫기' });
       grip.setAttribute('role', 'button');
       const key = () => kind === 'top' ? (state.reader ? 'readerTop' : 'top') : (state.reader ? 'readerCompose' : 'compose');
-      const set = open => { if (state[key()] !== open) { state[key()] = open; guardUntil = performance.now() + 700; apply(); } };
+      const set = open => {
+        if (folding || state[key()] === open) return;
+        guardUntil = performance.now() + 700;
+        animateFold(kind, open, () => { state[key()] = open; apply(); });
+      };
       // A tap flips the bar; a drag of 16px or more opens or folds it by direction.
       let startY = null;
       let moved = false;
