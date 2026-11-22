@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.8';
+  const VERSION = '1.0.9';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -462,6 +462,9 @@
       if (chatBar) {
         for (const [name, value] of Object.entries(lift)) chatBar.style.setProperty(name, value, 'important');
         if (chatBarHeight) chatBar.style.setProperty('min-height', `${chatBarHeight}px`);
+        // A phone can draw the first frame with the two bars a few pixels apart: the Chat Top Bar's
+        // own colour reaches up under the settings bar, so no chat text shows through the gap.
+        chatBar.style.setProperty('box-shadow', `0 -8px 0 0 ${getComputedStyle(chatBar).backgroundColor}`, 'important');
       }
       // The bars move as one block, all by the same distance. The Chat Top Bar's place while folded
       // differs from its place in the page: opening, it ends right under the settings bar; folding,
@@ -492,7 +495,7 @@
         done = true;
         if (open) keepChatPlace(commit);
         for (const slide of slides) slide.cancel();
-        for (const name of [...Object.keys(lift), 'min-height']) chatBar?.style.removeProperty(name);
+        for (const name of [...Object.keys(lift), 'min-height', 'box-shadow']) chatBar?.style.removeProperty(name);
         if (chatBar) {
           // The buttons take their settled look at once, then get their transitions back.
           void getComputedStyle(chatBar.lastElementChild || chatBar).visibility;
