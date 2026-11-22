@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.9';
+  const VERSION = '1.0.10';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -33,7 +33,7 @@
   const fontName = /^[^;{}<>\\]{0,80}$/;
   let state = { ...flags };
   for (const [key, spec] of Object.entries(looks)) state[key] = spec.value;
-  // Message menu choices per mode: button key → 'in' (inside ···) or 'out' (in the row). Only changes are kept.
+  // Message menu choices per mode: button key → 'in' (inside ···) or 'out' (in the row). Every choice the user makes is kept.
   const menus = ['menuNote', 'menuReader'];
   for (const key of menus) state[key] = {};
   function validMenu(value) {
@@ -267,7 +267,9 @@
           node.append(look.icon ? el('i', { className: 'fa-solid ' + look.icon }) : el('span', { className: 'qn-chip-abbr', textContent: look.label.slice(0, 2) }));
           node.addEventListener('click', () => {
             const next = inside(key) ? 'out' : 'in';
-            if (next === keyDefault.get(key)) delete choices[key]; else choices[key] = next;
+            // Kept even when it matches the default: where a button starts can change from one load
+            // to the next (other extensions arrange the row too), and the choice must not follow it.
+            choices[key] = next;
             caption.textContent = look.label + (next === 'in' ? '  →  ··· 안' : '  →  밖');
             apply();
           });
