@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.1';
+  const VERSION = '1.0.2';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -234,6 +234,14 @@
     function arrangeRow(row) {
       const { hint, box } = rowParts(row);
       if (!hint || !box) return;
+      // Some themes show the ··· box's buttons only once ST marks the box open (.visible). While the
+      // row is laid out here, the box always carries that mark; it comes off again with the mode.
+      if (menuActive()) {
+        if (!box.classList.contains('visible')) { box.classList.add('visible'); box.setAttribute('data-qn-visible', ''); }
+      } else if (box.hasAttribute('data-qn-visible')) {
+        box.classList.remove('visible');
+        box.removeAttribute('data-qn-visible');
+      }
       const choices = state[menuMode()];
       for (const node of noteButtons(row)) {
         if (!menuActive()) { node.removeAttribute('data-qn-menu'); continue; }
@@ -243,6 +251,22 @@
       }
     }
     const arrangeAll = () => chat?.querySelectorAll('.mes .mes_buttons').forEach(arrangeRow);
+    // Captions themes write into a message's name row (a house name on a ribbon, a motto): a pseudo-
+    // element whose content is words. Ornaments without words (a highlighter, a rule) stay as they are.
+    const wordy = /[\p{L}\p{N}]/u;
+    const hasWords = (node, part) => (getComputedStyle(node, part).content.match(/"(?:[^"\\]|\\.)*"/g) || []).some(text => wordy.test(text));
+    function markCaptions(scope = chat, fresh = false) {
+      if (!scope) return;
+      const marked = [...scope.querySelectorAll('[data-qn-caption]')];
+      if (!state.enabled || fresh) for (const node of marked) node.removeAttribute('data-qn-caption');
+      if (!state.enabled) return;
+      const rows = scope.matches?.('.ch_name') ? [scope] : scope.querySelectorAll('.mes .ch_name');
+      for (const row of rows) for (const node of [row, ...row.querySelectorAll('*')]) {
+        if (node.hasAttribute('data-qn-caption') || node.closest('.mes_buttons, .mes_edit_buttons')) continue;
+        const parts = ['before', 'after'].filter(part => hasWords(node, '::' + part));
+        if (parts.length) node.setAttribute('data-qn-caption', parts.join(' '));
+      }
+    }
     // Two zones of icon chips, like the message's own row and its ··· menu; a tap moves a button across.
     function menuPicker(modeKey, shownBy) {
       const outZone = el('div', { className: 'qn-chips' });
@@ -726,6 +750,7 @@
     const blueObserver = new MutationObserver(() => { if (!adjustingBlue) syncBlue(); });
     blueObserver.observe(document.body, {attributes: true, attributeFilter: ['class']});
     const menuRows = new Set();
+    const captionRoots = new Set();
     const actionsObserver = new MutationObserver(records => {
       if (!state.enabled) return;
       const mediaRoots = new Set();
@@ -751,12 +776,19 @@
           const row = node.closest('.mes_buttons');
           if (row) menuRows.add(row);
           else node.querySelectorAll('.mes_buttons').forEach(found => menuRows.add(found));
+          if (node.matches('.mes, .ch_name') || node.querySelector('.ch_name')) captionRoots.add(node);
         }
       }
       for (const scope of mediaRoots) refreshShells(scope);
       for (const row of menuRows) arrangeRow(row);
       menuRows.clear();
+      for (const node of captionRoots) markCaptions(node);
+      captionRoots.clear();
     });
+    // A theme change (ST rewrites its custom style) can add or drop captions: look again.
+    const themeStyle = document.getElementById('custom-style');
+    const themeObserver = new MutationObserver(() => { if (state.enabled) markCaptions(chat, true); });
+    if (themeStyle) themeObserver.observe(themeStyle, {childList: true, characterData: true, subtree: true});
     if (chat) actionsObserver.observe(chat, {childList: true, subtree: true, characterData: true});
     document.addEventListener('click', e => {
       const toggle = e.target.closest?.('.extraMesButtonsHint');
@@ -875,12 +907,14 @@
       wandObserver.disconnect();
       settingsObserver.disconnect();
       actionsObserver.disconnect();
+      themeObserver.disconnect();
       blueObserver.disconnect();
       barObserver.disconnect();
       closeActions();
       state.enabled = false;
       mountEdges();
       arrangeAll();
+      markCaptions();
       const form = document.getElementById('form_sheld');
       if (form) form.inert = false;
       for (const node of [dialog, readerBar, toc, wandContainer, settingsPanel]) node.remove();
@@ -941,6 +975,7 @@
     }
     let lastNames = null;
     let lastMedia = null;
+    let lastCaptions = false;
     function apply() {
       const anchor = captureAnchor();
       const reader = state.enabled && state.reader;
@@ -969,6 +1004,7 @@
       const form = document.getElementById('form_sheld');
       if (form) form.inert = state.enabled && !compose;
       arrangeAll();
+      if (lastCaptions !== state.enabled) { markCaptions(chat, true); lastCaptions = state.enabled; }
       syncSettings();
       holdAnchor(anchor);
       titleUpdate();

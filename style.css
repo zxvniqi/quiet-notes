@@ -743,6 +743,7 @@ html.qn-active #sheld#sheld#sheld #chat .mes :is(#qn-boost#qn-boost#qn-boost, .m
    a plain sheet with a hairline. Themes keep their sizes; their pictures, glows, frames,
    ornaments and button boxes don't show. Drawers that open from the top bar are left to their own rules. ── */
 html.qn-active #top-settings-holder#top-settings-holder#top-settings-holder,
+html.qn-active #top-bar#top-bar#top-bar,
 html.qn-active #sheld#sheld#sheld #extensionTopBar,
 html.qn-active #sheld#sheld#sheld #form_sheld #send_form {
   background-color: var(--qn-bar) !important; background-image: none !important; box-shadow: none !important; text-shadow: none !important;
@@ -759,6 +760,7 @@ html.qn-active #top-settings-holder#top-settings-holder#top-settings-holder :is(
 html.qn-active #sheld#sheld#sheld #extensionTopBar > :not(input):not(select) { background-color: transparent !important; border-color: transparent !important; }
 /* Ornaments hung on the bars themselves (crests, ribbons, lace edges). Icon glyphs on .drawer-icon stay. */
 html.qn-active #top-settings-holder#top-settings-holder#top-settings-holder::before, html.qn-active #top-settings-holder#top-settings-holder#top-settings-holder::after,
+html.qn-active #top-bar#top-bar#top-bar::before, html.qn-active #top-bar#top-bar#top-bar::after,
 html.qn-active #top-settings-holder#top-settings-holder#top-settings-holder :is(.drawer, .drawer-toggle)::before,
 html.qn-active #top-settings-holder#top-settings-holder#top-settings-holder :is(.drawer, .drawer-toggle, .drawer-icon)::after,
 html.qn-active #sheld#sheld#sheld #extensionTopBar::before, html.qn-active #sheld#sheld#sheld #extensionTopBar::after,
@@ -775,6 +777,9 @@ html.qn-active #sheld#sheld#sheld::before, html.qn-active #sheld#sheld#sheld::af
 /* No theme glow on anything around the message text, and no ornament captions on its name row and info. */
 html.qn-active #sheld#sheld#sheld :is(#chat, #form_sheld),
 html.qn-active #sheld#sheld#sheld #chat :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text *) { text-shadow: none !important; }
+/* Word captions a theme writes into the name row (marked by the script); wordless ornaments stay. */
+html.qn-active #sheld#sheld#sheld #chat .mes [data-qn-caption~="before"]::before,
+html.qn-active #sheld#sheld#sheld #chat .mes [data-qn-caption~="after"]::after { content: none !important; display: none !important; }
 /* Messages sit one after another; the gap between them is the message's own padding (and the divider),
    not the theme's card spacing. */
 html.qn-active #sheld#sheld#sheld #chat .mes { margin-top: 0 !important; margin-bottom: 0 !important; }
