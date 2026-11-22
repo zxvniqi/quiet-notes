@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.3';
+  const VERSION = '1.0.4';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -309,7 +309,7 @@
 
     const section = title => el('div', { className: 'qn-section', textContent: title });
     // Tabs: 공통 (both modes) · 일반 · 전자책 (each mode's own look) · 기타 (names and reset).
-    // One name throughout for the per-message buttons: "메시지 버튼", folded into "··· 메뉴".
+    // The per-message buttons are "메시지 버튼", folded into "··· 메뉴"; in the e-book they come with the swipe arrows as "편집 도구".
     const pages = {
       공통: [
         toggle('reader', '전자책 모드'),
@@ -335,8 +335,8 @@
         row('글자 크기', stepper('readerSize', 'px', 'readerType')), row('줄 간격', stepper('readerLine', '', 'readerType')),
         row('문단 간격', stepper('readerPara', 'em')), toggle('readerIndent', '첫 줄 들여쓰기'), row('좌우 여백', stepper('readerMargin', 'px')),
         row('정렬', choice('readerAlign')), row('구분선', choice('readerDivider')),
-        section('메시지 버튼'),
-        toggle('readerTools', '전자책에서도 보이기'), menuPicker('menuReader', 'readerTools'),
+        section('편집 도구'),
+        toggle('readerTools', '편집 도구 보이기'), menuPicker('menuReader', 'readerTools'),
       ],
       기타: [
         row('탭 제목', text('titleNote')), row('전자책 탭 제목', text('titleReader')),
