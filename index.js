@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.2';
+  const VERSION = '1.0.3';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -433,8 +433,11 @@
       if (chatBar && !open) chatBarHeight = chatBar.offsetHeight;
       const holder = document.getElementById('top-settings-holder');
       const shift = state.reader ? readerBar.offsetHeight || 52 :(holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
+      // Opening, the Chat Top Bar slides in while it still waits out of the page flow: the chat
+      // (a flex item with its own z-index) would cover it, and its folded look is dimmed.
+      const lift = { visibility: 'visible', opacity: '1', 'z-index': '100' };
       if (open && chatBar) {
-        chatBar.style.setProperty('visibility', 'visible', 'important');
+        for (const [name, value] of Object.entries(lift)) chatBar.style.setProperty(name, value, 'important');
         if (chatBarHeight) chatBar.style.setProperty('min-height', `${chatBarHeight}px`);
       }
       // The bars move as one block, all by the same distance. Opening, the Chat Top Bar starts from
@@ -448,30 +451,11 @@
       const timing = { duration: FOLD_MS, easing: FOLD_EASE, fill: 'forwards' };
       const slides = bars.map(bar => bar.animate(frames(bar), timing));
       if (topEdge.isConnected) slides.push(topEdge.animate([{ translate: '0 0' }, { translate: `0 ${open ? shift : -shift}px` }], timing));
-      // TEMP DEBUG (test branch only): records what the phone actually shows during a fold.
-      const dbg = { v: 'dbg1', ua: navigator.userAgent, open, reader: state.reader, shift, translate: CSS.supports('translate', '0 1px'), reduced: !!reducedMotion?.matches, t0: Math.round(performance.now()), frames: [] };
-      const R = node => node ? Math.round(node.getBoundingClientRect().top) : null;
-      const sample = tag => {
-        const cs = chatBar ? getComputedStyle(chatBar) : null;
-        dbg.frames.push({ tag, t: Math.round(performance.now()) - dbg.t0, h: R(holder), hv: holder ? getComputedStyle(holder).visibility + '/' + getComputedStyle(holder).translate : null, c: R(chatBar), cv: cs ? cs.visibility + '/' + cs.opacity + '/' + cs.display + '/' + cs.position : null, e: R(topEdge), ps: slides.map(s => s.playState + ':' + Math.round(s.currentTime ?? -1)) });
-      };
-      sample('start');
-      const tick = () => { if (dbg.frames.length < 40 && !dbg.end) { sample('raf'); requestAnimationFrame(tick); } };
-      requestAnimationFrame(tick);
       folding = true;
       let done = false;
       const finish = () => {
         if (done) return;
         done = true;
-        sample('finish');
-        dbg.end = Math.round(performance.now()) - dbg.t0;
-        requestAnimationFrame(() => { sample('after'); dbg.commitMs = dbg.frames.at(-1).t - dbg.end; setTimeout(() => {
-          const logs = (window.__qnDbg = [...(window.__qnDbg || []), dbg].slice(-6));
-          try {
-            const json = JSON.stringify(logs);
-            fetch('/api/files/upload', { method: 'POST', headers: SillyTavern.getContext().getRequestHeaders(), body: JSON.stringify({ name: 'qn-debug.json', data: btoa(unescape(encodeURIComponent(json))) }) });
-          } catch { /* debug only */ }
-        }, 300); });
         // ST keeps the chat's text in place when the chat changes height (its resize observer adjusts
         // the scroll before the next paint, in browsers with CSS field-sizing); elsewhere it's done here.
         const stHolds = window.CSS?.supports?.('field-sizing', 'content');
@@ -483,8 +467,7 @@
         // A reading-place hold still running from a mode change keeps going from the text's new place.
         if (heldAnchor && !heldAnchor.bottom) { heldAnchor.offset -= moved; heldAnchor.textOffset -= moved; }
         for (const slide of slides) slide.cancel();
-        chatBar?.style.removeProperty('visibility');
-        chatBar?.style.removeProperty('min-height');
+        for (const name of [...Object.keys(lift), 'min-height']) chatBar?.style.removeProperty(name);
         folding = false;
       };
       // Animations pause while the page is hidden: the bar still settles on time.
