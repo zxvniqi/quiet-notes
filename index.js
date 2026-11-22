@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.2';
+  const VERSION = '1.0.3';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -758,6 +758,12 @@
         for (const node of shells) if (!node.isConnected) shells.delete(node);
       }
       for (const record of records) {
+        if (record.type === 'attributes') {
+          // ST takes its "open" mark off the ··· box on any press elsewhere: while the row is ours, it goes back.
+          const box = record.target;
+          if (box.hasAttribute('data-qn-visible') && !box.classList.contains('visible')) box.classList.add('visible');
+          continue;
+        }
         const target = record.target.nodeType === Node.TEXT_NODE ? record.target.parentElement : record.target;
         const name = target?.closest?.('.name_text');
         if (name && !state.names) updateName(name);
@@ -789,7 +795,8 @@
     const themeStyle = document.getElementById('custom-style');
     const themeObserver = new MutationObserver(() => { if (state.enabled) markCaptions(chat, true); });
     if (themeStyle) themeObserver.observe(themeStyle, {childList: true, characterData: true, subtree: true});
-    if (chat) actionsObserver.observe(chat, {childList: true, subtree: true, characterData: true});
+    // Class changes matter only on ··· boxes carrying data-qn-visible; any other one costs a single attribute check.
+    if (chat) actionsObserver.observe(chat, {childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class']});
     document.addEventListener('click', e => {
       const toggle = e.target.closest?.('.extraMesButtonsHint');
       if (!toggle || !state.enabled || !(state.actions || state.reader)) return;
@@ -893,6 +900,9 @@
         if (state.enabled) root.setAttribute(name, value()); else root.removeAttribute(name);
       }
       if (!state.enabled) root.style.removeProperty('--qn-bar-h');
+      // One class for "a dark page": the dark rules start from it, so on a light page the browser
+      // skips them at once instead of testing every element against the mode attributes.
+      root.classList.toggle('qn-dark', state.enabled && (state.reader ? state.paper === 'night' : state.noteColor === 'dark'));
       applyUiSize();
     }
     function syncSettings() {
