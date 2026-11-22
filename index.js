@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.4';
+  const VERSION = '1.0.5';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -422,32 +422,46 @@
       if (state.reader && !top) showToc(false);
       try { window.localStorage.setItem(KEY, JSON.stringify({ ...state, v: 3 })); } catch { /* Session still works. */ }
     }
-    // The top bar moves first and commits last. Changing a class on <html> restyles the whole page
-    // and moving the top re-lays it out, which can take a few hundred ms in a big chat: done before
-    // the slide, that work freezes its start. So the bars and the grip line slide on the compositor
-    // right away, the text stays still, and the layout change happens once they are in place.
+    // Folding the top bar works like the composer: the page takes its new layout at once (the chat
+    // reaches the top, its text staying where it was), and the bars slide away over it, so the chat
+    // is already there under them. Opening, the bars slide in over the chat first and the layout
+    // change comes once they are in place, so the chat is never left with an empty strip above it.
+    // Only positions animate (the `translate` property, which theme `transform` rules don't touch).
     let chatBarHeight = 0; // the Chat Top Bar's height in the page (it waits a little shorter while folded)
+    // While it slides, the Chat Top Bar waits out of the page flow: the chat (a flex item with its own
+    // z-index) would cover it, and its folded look is dimmed and hidden.
+    const lift = { visibility: 'visible', opacity: '1', 'z-index': '100' };
+    function keepChatPlace(change) {
+      // ST keeps the chat's text in place when the chat changes height (its resize observer adjusts
+      // the scroll before the next paint, in browsers with CSS field-sizing); elsewhere it's done here.
+      const stHolds = window.CSS?.supports?.('field-sizing', 'content');
+      const chatTop = chat ? chat.getBoundingClientRect().top : 0;
+      const scrolled = chat ? chat.scrollTop : 0;
+      change();
+      const moved = chat ? chat.getBoundingClientRect().top - chatTop : 0;
+      if (!stHolds && chat) chat.scrollTop = scrolled + moved;
+      // A reading-place hold still running from a mode change keeps going from the text's new place.
+      if (heldAnchor && !heldAnchor.bottom) { heldAnchor.offset -= moved; heldAnchor.textOffset -= moved; }
+    }
     function foldTop(open, commit) {
       const bars = foldBars('top');
       const chatBar = state.reader ? null : document.getElementById('extensionTopBar');
       if (chatBar && !open) chatBarHeight = chatBar.offsetHeight;
       const holder = document.getElementById('top-settings-holder');
-      const shift = state.reader ? readerBar.offsetHeight || 52 :(holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
-      // Opening, the Chat Top Bar slides in while it still waits out of the page flow: the chat
-      // (a flex item with its own z-index) would cover it, and its folded look is dimmed.
-      const lift = { visibility: 'visible', opacity: '1', 'z-index': '100' };
-      if (open && chatBar) {
+      const shift = state.reader ? readerBar.offsetHeight || 52 : (holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
+      const lineBefore = topEdge.isConnected ? topEdge.getBoundingClientRect().top : 0;
+      const chatBarBefore = chatBar ? chatBar.getBoundingClientRect().top : 0;
+      if (!open) keepChatPlace(commit);
+      if (chatBar) {
         for (const [name, value] of Object.entries(lift)) chatBar.style.setProperty(name, value, 'important');
         if (chatBarHeight) chatBar.style.setProperty('min-height', `${chatBarHeight}px`);
       }
-      // Folding, the chat only moves up once the bars are gone: until then the strip they leave
-      // would show the page background. The chat's own colour fills it (a shadow: paint only).
-      const sheld = document.getElementById('sheld');
-      const fill = [sheld, chat].map(node => node && getComputedStyle(node).backgroundColor).find(color => color && !/^rgba\(.*,\s*0\)$|^transparent$/.test(color));
-      if (!open && sheld && fill) sheld.style.setProperty('box-shadow', `0 -${shift}px 0 0 ${fill}`, 'important');
-      // The bars move as one block, all by the same distance. Opening, the Chat Top Bar starts from
-      // where it waits while folded and ends right under the settings bar, its place in the page.
-      const offset = bar => bar === chatBar && open ? (holder?.offsetHeight || 0) - chatBar.getBoundingClientRect().top : 0;
+      // The bars move as one block, all by the same distance. The Chat Top Bar's place while folded
+      // differs from its place in the page: opening, it ends right under the settings bar; folding,
+      // it starts from where it was before the layout change.
+      const offset = bar => bar !== chatBar ? 0
+        : open ? (holder?.offsetHeight || 0) - chatBar.getBoundingClientRect().top
+        : chatBarBefore - chatBar.getBoundingClientRect().top;
       const frames = bar => {
         const at = offset(bar);
         const shown = `0 ${at}px`, away = `0 ${at - shift}px`;
@@ -455,25 +469,18 @@
       };
       const timing = { duration: FOLD_MS, easing: FOLD_EASE, fill: 'forwards' };
       const slides = bars.map(bar => bar.animate(frames(bar), timing));
-      if (topEdge.isConnected) slides.push(topEdge.animate([{ translate: '0 0' }, { translate: `0 ${open ? shift : -shift}px` }], timing));
+      if (topEdge.isConnected) {
+        if (open) slides.push(topEdge.animate([{ translate: '0 0' }, { translate: `0 ${shift}px` }], timing));
+        else glide(topEdge, lineBefore - topEdge.getBoundingClientRect().top);
+      }
       folding = true;
       let done = false;
       const finish = () => {
         if (done) return;
         done = true;
-        // ST keeps the chat's text in place when the chat changes height (its resize observer adjusts
-        // the scroll before the next paint, in browsers with CSS field-sizing); elsewhere it's done here.
-        const stHolds = window.CSS?.supports?.('field-sizing', 'content');
-        const chatTop = chat ? chat.getBoundingClientRect().top : 0;
-        const scrolled = chat ? chat.scrollTop : 0;
-        commit();
-        const moved = chat ? chat.getBoundingClientRect().top - chatTop : 0;
-        if (!stHolds && chat) chat.scrollTop = scrolled + moved;
-        // A reading-place hold still running from a mode change keeps going from the text's new place.
-        if (heldAnchor && !heldAnchor.bottom) { heldAnchor.offset -= moved; heldAnchor.textOffset -= moved; }
+        if (open) keepChatPlace(commit);
         for (const slide of slides) slide.cancel();
         for (const name of [...Object.keys(lift), 'min-height']) chatBar?.style.removeProperty(name);
-        if (!open) sheld?.style.removeProperty('box-shadow');
         folding = false;
       };
       // Animations pause while the page is hidden: the bar still settles on time.
