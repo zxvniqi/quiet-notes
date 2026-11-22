@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.6';
+  const VERSION = '1.0.7';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -440,13 +440,18 @@
       change();
       const moved = chat ? chat.getBoundingClientRect().top - chatTop : 0;
       if (!stHolds && chat) chat.scrollTop = scrolled + moved;
+      // Read from the very top, the chat stays at the top (ST's observer would push it down a bar's height).
+      if (chat && scrolled <= 1) {
+        chat.scrollTop = 0;
+        if (stHolds) { const top = new ResizeObserver(() => { chat.scrollTop = 0; top.disconnect(); }); top.observe(chat); }
+      }
       // A reading-place hold still running from a mode change keeps going from the text's new place.
       if (heldAnchor && !heldAnchor.bottom) { heldAnchor.offset -= moved; heldAnchor.textOffset -= moved; }
     }
     function foldTop(open, commit) {
       const bars = foldBars('top');
       const chatBar = state.reader ? null : document.getElementById('extensionTopBar');
-      if (chatBar && !open) chatBarHeight = chatBar.offsetHeight;
+      if (chatBar && !open) chatBarHeight = chatBar.getBoundingClientRect().height;
       const holder = document.getElementById('top-settings-holder');
       const shift = state.reader ? readerBar.offsetHeight || 52 : (holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
       const lineBefore = topEdge.isConnected ? topEdge.getBoundingClientRect().top : 0;

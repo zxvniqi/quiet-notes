@@ -189,7 +189,9 @@ html.qn-active.qn-top-visible :is(.drawer-content, #left-nav-panel, #right-nav-p
 }
 
 /* ── Chat Top Bar: one line, folds with the tools ── */
-html.qn-active.qn-active.qn-top-visible #extensionTopBar#extensionTopBar {
+/* Sliding in or out, the Chat Top Bar already wears its open look (its place stays the folded one). */
+html.qn-active.qn-active.qn-top-visible #extensionTopBar#extensionTopBar,
+html.qn-active.qn-active:not(.qn-reader) #extensionTopBar#extensionTopBar.qn-sliding {
   display: flex !important; position: relative !important; inset: auto !important;
   width: 100% !important; min-width: 0 !important; max-width: 100% !important; height: auto !important;
   max-height: none !important; margin: 0 !important; flex: 0 0 auto !important;
