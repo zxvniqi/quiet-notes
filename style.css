@@ -792,3 +792,5 @@ html.qn-active.qn-reader #sheld#sheld#sheld #form_sheld .stscript_btn > i { anim
 html.qn-active.qn-reader #rm_button_characters { display: none !important; }
 /* E-book: whatever an extension puts under the text (e.g. a swipe row) keeps a little air above it. */
 html.qn-active.qn-reader #chat .mes .mes_block > .mes_text ~ * { margin-top: 16px !important; }
+/* An open row needs no ··· of its own: a press anywhere outside it (or Escape) folds it again. */
+html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open > .extraMesButtonsHint { display: none !important; }
