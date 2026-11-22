@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.7';
+  const VERSION = '1.0.8';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -408,9 +408,9 @@
       if (kind === 'bottom') return [document.getElementById('form_sheld')].filter(Boolean);
       return (state.reader ? [readerBar] : [document.getElementById('top-settings-holder'), document.getElementById('extensionTopBar')]).filter(Boolean);
     }
-    const glide = (node, shift) => {
-      if (Math.abs(shift) > 1) node.animate([{ translate: `0 ${shift}px` }, { translate: '0 0' }], { duration: FOLD_MS, easing: FOLD_EASE });
-    };
+    const glide = (node, shift) => Math.abs(shift) > 1
+      ? node.animate([{ translate: `0 ${shift}px` }, { translate: '0 0' }], { duration: FOLD_MS, easing: FOLD_EASE })
+      : null;
     function applyBars() {
       const top = state.reader ? state.readerTop : state.top;
       const compose = state.reader ? state.readerCompose : state.compose;
@@ -476,10 +476,15 @@
       };
       const timing = { duration: FOLD_MS, easing: FOLD_EASE, fill: 'forwards' };
       const slides = bars.map(bar => bar.animate(frames(bar), timing));
+      let lineGlide = null;
       if (topEdge.isConnected) {
         if (open) slides.push(topEdge.animate([{ translate: '0 0' }, { translate: `0 ${shift}px` }], timing));
-        else glide(topEdge, lineBefore - topEdge.getBoundingClientRect().top);
+        else lineGlide = glide(topEdge, lineBefore - topEdge.getBoundingClientRect().top);
       }
+      // One start time for all: each moving layer is set up on its own, and a phone can start one a
+      // frame after another, which opens a pixel's gap (or overlap) between the bars.
+      const start = document.timeline?.currentTime;
+      if (start != null) for (const slide of [...slides, lineGlide]) if (slide) slide.startTime = start;
       folding = true;
       let done = false;
       const finish = () => {
