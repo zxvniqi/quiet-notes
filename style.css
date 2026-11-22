@@ -62,8 +62,11 @@ html.qn-active.qn-reader[data-qn-paper="night"] {
   --qn-tools: 0px;
   --sheldWidth: min(900px, 100vw);
 }
-:root.qn-active.qn-top-visible, .qn-active.qn-top-visible body { --qn-tools: var(--qn-bar-h, var(--topBarBlockSize, 44px)); }
-:root.qn-active.qn-reader.qn-top-visible, .qn-active.qn-reader.qn-top-visible body { --qn-tools: 52px; }
+/* The open bar's height never changes with the fold: a custom property that changed on <html> would
+   restyle every element of the page, which froze the fold's start on phones. The fold switches only
+   the few rules below that use it (a property each, on the elements that need it). */
+:root.qn-active, .qn-active body { --qn-tools-open: var(--qn-bar-h, var(--topBarBlockSize, 44px)); }
+:root.qn-active.qn-reader, .qn-active.qn-reader body { --qn-tools-open: 52px; }
 .qn-active body { background: var(--qn-page) !important; color: var(--qn-text); text-shadow: none !important; }
 /* Native GPU transforms must not make fixed controls follow document scrolling. */
 html.qn-active { transform: none !important; perspective: none !important; }
@@ -169,6 +172,16 @@ html.qn-active #top-settings-holder#top-settings-holder {
 }
 .qn-active #top-bar { top: var(--qn-header) !important; background: var(--qn-bar) !important; box-shadow: none !important; }
 html.qn-active.qn-active:not(.qn-top-visible) :is(#top-bar#top-bar, #extensionConnectionProfiles) { display: none !important; }
+html.qn-active.qn-top-visible #sheld#sheld#sheld {
+  top: calc(var(--qn-header) + var(--qn-tools-open)) !important;
+  height: calc(100vh - var(--qn-header) - var(--qn-tools-open)) !important;
+  height: calc(100dvh - var(--qn-header) - var(--qn-tools-open)) !important;
+  max-height: calc(100dvh - var(--qn-header) - var(--qn-tools-open)) !important;
+}
+html.qn-active.qn-top-visible :is(.drawer-content, #left-nav-panel, #right-nav-panel) {
+  top: calc(var(--qn-header) + var(--qn-tools-open)) !important;
+  max-height: calc(100dvh - var(--qn-header) - var(--qn-tools-open)) !important;
+}
 .qn-active :is(.drawer-content, #left-nav-panel, #right-nav-panel) {
   top: calc(var(--qn-header) + var(--qn-tools)) !important;
   max-height: calc(100dvh - var(--qn-header) - var(--qn-tools)) !important;
@@ -399,6 +412,7 @@ html.qn-active #toast-container {
   width: max-content !important; max-width: calc(100vw - 32px) !important;
   display: flex !important; flex-direction: column !important; align-items: center !important; pointer-events: none;
 }
+html.qn-active.qn-top-visible:not([data-qn-toast="bottom"]) #toast-container { top: calc(var(--qn-header) + var(--qn-tools-open) + 10px) !important; }
 html.qn-active[data-qn-toast="bottom"] #toast-container { top: auto !important; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px) !important; flex-direction: column-reverse !important; }
 html.qn-active #toast-container > .toast {
   --qn-dot: var(--qn-muted);
@@ -524,6 +538,7 @@ html.qn-active.qn-active.qn-reader #top-settings-holder#top-settings-holder#top-
   display: block !important; height: 0 !important; min-height: 0 !important; overflow: visible !important;
   top: calc(var(--qn-header) + var(--qn-tools)) !important; background: none !important; border: 0 !important;
 }
+html.qn-active.qn-active.qn-reader.qn-top-visible #top-settings-holder#top-settings-holder#top-settings-holder { top: calc(var(--qn-header) + var(--qn-tools-open)) !important; }
 html.qn-active.qn-reader #top-settings-holder .drawer-toggle,
 html.qn-active.qn-active.qn-reader #top-bar#top-bar#top-bar { display: none !important; }
 /* Chat Top Bar: its actions are in the contents list. */
