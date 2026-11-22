@@ -372,7 +372,7 @@ html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open {
   html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open { animation: none; }
 }
 
-/* ── Action loader: document icon, centred on the actual icon ── */
+/* ── Action loader: a thin ring in place of the gear, centred on the actual icon ── */
 html.qn-active .popup:has(#loader:not(.splash-screen) #load-spinner) {
   position: fixed !important; inset: 0 !important; margin: 0 !important; padding: 0 !important;
   width: 100vw !important; width: 100dvw !important; height: 100vh !important; height: 100dvh !important;
@@ -385,7 +385,7 @@ html.qn-active #loader:not(.splash-screen):has(#load-spinner) {
 }
 html.qn-active #loader:not(.splash-screen) #load-spinner {
   position: static !important; inset: auto !important; transform: none !important; animation: none !important;
-  display: grid !important; place-items: center !important; width: 32px !important; height: 42px !important;
+  display: grid !important; place-items: center !important; width: 32px !important; height: 32px !important;
   margin: 0 !important; padding: 0 !important; font-size: 0 !important; line-height: 1 !important;
   transition: none !important; background: none !important; border: 0 !important;
 }
@@ -393,13 +393,11 @@ html.qn-active #loader:not(.splash-screen) #load-spinner > *,
 html.qn-active #loader:not(.splash-screen) #load-spinner::after { display: none !important; }
 html.qn-active #loader:not(.splash-screen) #load-spinner::before {
   content: '' !important; position: static !important; display: block !important; transform: none !important;
-  width: 32px !important; height: 42px !important; margin: 0 !important; box-sizing: border-box;
-  border: 2px solid var(--qn-muted); border-radius: 4px;
-  background: linear-gradient(var(--qn-div), var(--qn-div)) 6px 10px/16px 2px no-repeat,
-              linear-gradient(var(--qn-div), var(--qn-div)) 6px 18px/16px 2px no-repeat,
-              linear-gradient(var(--qn-div), var(--qn-div)) 6px 26px/11px 2px no-repeat;
-  animation: qn-action-pulse 1.4s ease-in-out infinite;
+  width: 30px !important; height: 30px !important; margin: 0 !important; box-sizing: border-box; background: none;
+  border: 2.5px solid var(--qn-div); border-top-color: var(--qn-muted); border-radius: 50%;
+  animation: qn-loader-ring .9s linear infinite;
 }
+@keyframes qn-loader-ring { to { rotate: 360deg; } }
 @keyframes qn-action-pulse { 50% { opacity: .4; } }
 @media (prefers-reduced-motion: reduce) {
   html.qn-active #loader:not(.splash-screen) #load-spinner::before { animation: none; }
