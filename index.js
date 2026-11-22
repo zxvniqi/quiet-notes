@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.5';
+  const VERSION = '1.0.6';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -451,6 +451,8 @@
       const shift = state.reader ? readerBar.offsetHeight || 52 : (holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
       const lineBefore = topEdge.isConnected ? topEdge.getBoundingClientRect().top : 0;
       const chatBarBefore = chatBar ? chatBar.getBoundingClientRect().top : 0;
+      // Its buttons fade their visibility in and out (a 0.3s transition): sliding, they'd lag behind.
+      chatBar?.classList.add('qn-sliding');
       if (!open) keepChatPlace(commit);
       if (chatBar) {
         for (const [name, value] of Object.entries(lift)) chatBar.style.setProperty(name, value, 'important');
@@ -481,6 +483,11 @@
         if (open) keepChatPlace(commit);
         for (const slide of slides) slide.cancel();
         for (const name of [...Object.keys(lift), 'min-height']) chatBar?.style.removeProperty(name);
+        if (chatBar) {
+          // The buttons take their settled look at once, then get their transitions back.
+          void getComputedStyle(chatBar.lastElementChild || chatBar).visibility;
+          chatBar.classList.remove('qn-sliding');
+        }
         folding = false;
       };
       // Animations pause while the page is hidden: the bar still settles on time.
