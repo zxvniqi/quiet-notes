@@ -395,11 +395,14 @@
       }
     };
     for (const type of ['click', 'mousedown', 'mouseup', 'touchend', 'pointerup', 'contextmenu']) document.addEventListener(type, guard, { capture: true, signal: abort.signal });
-    // Folding a bar slides it out of / into view and moves the page text along with it.
-    // Only positions animate (the `translate` property, which theme `transform` rules don't touch),
-    // so a long chat isn't re-laid out on every frame. Closing slides first, then the page settles;
-    // opening settles the page first, then the bar and the text glide into their new places.
+    // Folding a bar: the page settles into its new layout at once, and everything that moved
+    // (the bars, the grip lines and the text) glides there together on the same curve. Only
+    // positions animate (the `translate` property, which theme `transform` rules don't touch),
+    // so a long chat isn't laid out again on every frame. A bar that folds away stays on screen
+    // just long enough to slide out (qn-*-leaving), without taking space any more.
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const FOLD_MS = 240;
+    const FOLD_EASE = 'cubic-bezier(.2, .8, .2, 1)';
     let folding = false;
     function readingPoint() {
       if (!chat) return null;
@@ -413,38 +416,35 @@
       if (kind === 'bottom') return [document.getElementById('form_sheld')].filter(Boolean);
       return (state.reader ? [readerBar] : [document.getElementById('top-settings-holder'), document.getElementById('extensionTopBar')]).filter(Boolean);
     }
+    const glide = (node, shift) => {
+      if (Math.abs(shift) > 1) node.animate([{ translate: `0 ${shift}px` }, { translate: '0 0' }], { duration: FOLD_MS, easing: FOLD_EASE });
+    };
     function animateFold(kind, open, commit) {
       if (!state.enabled || reducedMotion?.matches || typeof Element.prototype.animate !== 'function') { commit(); return; }
       const away = kind === 'top' ? '0 -100%' : '0 100%';
-      const ease = 'cubic-bezier(.22, .8, .3, 1)';
+      const leaving = kind === 'top' ? 'qn-top-leaving' : 'qn-compose-leaving';
       const point = readingPoint();
-      const glideText = () => {
-        if (!point?.el.isConnected) return;
-        const shift = point.top - point.el.getBoundingClientRect().top;
-        if (Math.abs(shift) > 1) chat.animate([{ translate: `0 ${shift}px` }, { translate: '0 0' }], { duration: 240, easing: ease });
-      };
-      if (open) {
-        commit();
-        glideText();
-        for (const bar of foldBars(kind)) bar.animate([{ translate: away, opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 260, easing: ease });
-        return;
-      }
+      const lines = [topEdge, bottomEdge].filter(node => node.isConnected);
+      const linesBefore = lines.map(node => node.getBoundingClientRect().top);
+      if (!open) root.classList.add(leaving);
+      commit();
+      lines.forEach((node, i) => glide(node, linesBefore[i] - node.getBoundingClientRect().top));
+      if (point?.el.isConnected) glide(chat, point.top - point.el.getBoundingClientRect().top);
+      const frames = open ? [{ translate: away, opacity: 0 }, { translate: '0 0', opacity: 1 }] : [{ translate: '0 0', opacity: 1 }, { translate: away, opacity: 0 }];
+      const slides = foldBars(kind).map(bar => bar.animate(frames, { duration: FOLD_MS, easing: FOLD_EASE, fill: open ? 'none' : 'forwards' }));
+      if (open) return;
       folding = true;
-      root.classList.add('qn-folding');
-      const slides = foldBars(kind).map(bar => bar.animate([{ translate: '0 0', opacity: 1 }, { translate: away, opacity: 0 }], { duration: 200, easing: 'cubic-bezier(.4, 0, .9, .6)', fill: 'forwards' }));
       let done = false;
       const finish = () => {
         if (done) return;
         done = true;
-        commit();
+        root.classList.remove(leaving);
         for (const slide of slides) slide.cancel();
-        root.classList.remove('qn-folding');
         folding = false;
-        glideText();
       };
-      // Animations pause while the page is hidden: the bar still folds on time.
+      // Animations pause while the page is hidden: the bar still leaves on time.
       Promise.all(slides.map(slide => slide.finished.catch(() => {}))).then(finish);
-      setTimeout(finish, 260);
+      setTimeout(finish, FOLD_MS + 80);
     }
     function edge(kind) {
       const grip = el('div', { className: 'qn-edge-grip', tabIndex: 0, title: kind === 'top' ? '상단 도구 열기·닫기' : '입력 바 열기·닫기' });
@@ -453,7 +453,7 @@
       const set = open => {
         if (folding || state[key()] === open) return;
         guardUntil = performance.now() + 700;
-        animateFold(kind, open, () => { state[key()] = open; apply(); });
+        animateFold(kind, open, () => { state[key()] = open; apply({ quick: true }); });
       };
       // A tap flips the bar; a drag of 16px or more opens or folds it by direction.
       let startY = null;
@@ -841,7 +841,7 @@
     }
     let lastNames = null;
     let lastMedia = null;
-    function apply() {
+    function apply({ quick = false } = {}) {
       const anchor = captureAnchor();
       const reader = state.enabled && state.reader;
       const top = state.reader ? state.readerTop : state.top;
@@ -870,7 +870,8 @@
       if (form) form.inert = state.enabled && !compose;
       arrangeAll();
       syncSettings();
-      holdAnchor(anchor);
+      // A bar fold glides the page itself; everything else holds the reading place while late layout settles.
+      if (quick) restoreAnchor(anchor); else holdAnchor(anchor);
       titleUpdate();
       updateFavicons();
       try { window.localStorage.setItem(KEY, JSON.stringify({ ...state, v: 3 })); } catch { /* Session still works. */ }
