@@ -545,7 +545,12 @@ html.qn-active.qn-active.qn-active.qn-reader #send_form #send_textarea:focus { b
 html.qn-active.qn-reader #chat .mes:is([type="assistant_message"], [type="welcome_prompt"]) { display: none !important; }
 
 /* ── Bars: folded bars leave the page at once; a bar that opens fades in (no layout animation) ── */
-html.qn-active.qn-active:not(.qn-top-visible) :is(#top-settings-holder#top-settings-holder#top-settings-holder, #qn-reader-bar#qn-reader-bar, #extensionTopBar#extensionTopBar#extensionTopBar) { display: none !important; }
+/* A folded top bar stays laid out, just out of sight: opening it then needs no fresh layout of its
+   drawers or of the Chat Top Bar, so the slide starts without a hitch. */
+html.qn-active.qn-active:not(.qn-top-visible) :is(#top-settings-holder#top-settings-holder#top-settings-holder, #qn-reader-bar#qn-reader-bar) { translate: 0 -100%; pointer-events: none !important; }
+/* Panels that belong to a folded top bar stay out of sight (the bar itself just waits above the screen). */
+html.qn-active.qn-active:not(.qn-top-visible) #top-settings-holder .drawer-content { visibility: hidden !important; }
+html.qn-active.qn-active:not(.qn-top-visible):not(.qn-reader) #sheld#sheld#sheld #extensionTopBar { position: absolute !important; top: var(--qn-bar-h, 0px) !important; left: 0 !important; right: 0 !important; visibility: hidden !important; pointer-events: none !important; }
 /* The folded composer stays laid out just below the screen (not display:none): buttons that other
    scripts dock beside the wand (e.g. a WI monitor) then stay put instead of leaving and coming back. */
 html.qn-active.qn-active:not(.qn-compose-visible) #form_sheld#form_sheld {
@@ -555,9 +560,9 @@ html.qn-active.qn-active:not(.qn-compose-visible) #form_sheld#form_sheld {
 html.qn-active.qn-active:not(.qn-compose-visible) #sheld#sheld#sheld { overflow: hidden !important; }
 /* Bars slide in and out from the script (Web Animations on translate). A bar folding away stays
    on screen just long enough to slide out, without taking space: the page has already settled. */
-html.qn-active.qn-active.qn-top-leaving:not(.qn-reader) #top-settings-holder#top-settings-holder#top-settings-holder { display: flex !important; }
-html.qn-active.qn-active.qn-top-leaving.qn-reader #qn-reader-bar#qn-reader-bar#qn-reader-bar { display: flex !important; }
-html.qn-active.qn-active.qn-top-leaving:not(.qn-reader) #sheld#sheld#sheld #extensionTopBar { display: flex !important; position: absolute !important; top: var(--qn-bar-h, 0px) !important; left: 0 !important; right: 0 !important; z-index: 5 !important; }
+html.qn-active.qn-active.qn-top-leaving:not(.qn-reader) #top-settings-holder#top-settings-holder#top-settings-holder { visibility: visible !important; }
+html.qn-active.qn-active.qn-top-leaving.qn-reader #qn-reader-bar#qn-reader-bar#qn-reader-bar { visibility: visible !important; }
+html.qn-active.qn-active.qn-top-leaving:not(.qn-reader) #sheld#sheld#sheld#sheld #extensionTopBar { display: flex !important; visibility: visible !important; position: absolute !important; top: var(--qn-bar-h, 0px) !important; left: 0 !important; right: 0 !important; z-index: 5 !important; }
 html.qn-active.qn-active.qn-compose-leaving #form_sheld#form_sheld#form_sheld { top: auto !important; bottom: 0 !important; opacity: 1 !important; }
 html.qn-active:is(.qn-top-leaving, .qn-compose-leaving) #sheld#sheld#sheld { overflow: hidden !important; }
 /* The composer and its popups (e.g. Direction Manager) stay above the edge grips. */

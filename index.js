@@ -404,14 +404,6 @@
     const FOLD_MS = 240;
     const FOLD_EASE = 'cubic-bezier(.2, .8, .2, 1)';
     let folding = false;
-    function readingPoint() {
-      if (!chat) return null;
-      const box = chat.getBoundingClientRect();
-      const hit = document.elementsFromPoint(box.left + box.width / 2, box.top + Math.min(box.height * 0.4, 240))
-        .find(node => node.closest?.('#chat .mes'));
-      const el = hit?.closest('#chat .mes_text p, #chat .mes_text, #chat .mes') || null;
-      return el ? { el, top: el.getBoundingClientRect().top } : null;
-    }
     function foldBars(kind) {
       if (kind === 'bottom') return [document.getElementById('form_sheld')].filter(Boolean);
       return (state.reader ? [readerBar] : [document.getElementById('top-settings-holder'), document.getElementById('extensionTopBar')]).filter(Boolean);
@@ -419,17 +411,76 @@
     const glide = (node, shift) => {
       if (Math.abs(shift) > 1) node.animate([{ translate: `0 ${shift}px` }, { translate: '0 0' }], { duration: FOLD_MS, easing: FOLD_EASE });
     };
+    function applyBars() {
+      const top = state.reader ? state.readerTop : state.top;
+      const compose = state.reader ? state.readerCompose : state.compose;
+      root.classList.toggle('qn-top-visible', state.enabled && top);
+      root.classList.toggle('qn-compose-visible', state.enabled && compose);
+      for (const [node, open] of [[topEdge, top], [bottomEdge, compose]]) node.firstElementChild.setAttribute('aria-expanded', String(open));
+      const form = document.getElementById('form_sheld');
+      if (form) form.inert = state.enabled && !compose;
+      if (state.reader && !top) showToc(false);
+      try { window.localStorage.setItem(KEY, JSON.stringify({ ...state, v: 3 })); } catch { /* Session still works. */ }
+    }
+    // The top bar moves first and commits last. Changing a class on <html> restyles the whole page
+    // and moving the top re-lays it out, which can take a few hundred ms in a big chat: done before
+    // the slide, that work freezes its start. So the bars and the grip line slide on the compositor
+    // right away, the text stays still, and the layout change happens once they are in place.
+    let chatBarHeight = 0; // the Chat Top Bar's height in the page (it waits a little shorter while folded)
+    function foldTop(open, commit) {
+      const bars = foldBars('top');
+      const chatBar = state.reader ? null : document.getElementById('extensionTopBar');
+      if (chatBar && !open) chatBarHeight = chatBar.offsetHeight;
+      const holder = document.getElementById('top-settings-holder');
+      const shift = state.reader ? 52 : (holder?.offsetHeight || 0) + (chatBar ? chatBarHeight || chatBar.offsetHeight : 0);
+      const away = '0 -100%';
+      if (open && chatBar) chatBar.style.setProperty('visibility', 'visible', 'important');
+      const frames = open ? [{ translate: away, opacity: 0 }, { translate: '0 0', opacity: 1 }] : [{ translate: '0 0', opacity: 1 }, { translate: away, opacity: 0 }];
+      const timing = { duration: FOLD_MS, easing: FOLD_EASE, fill: 'forwards' };
+      const slides = bars.map(bar => bar.animate(frames, timing));
+      if (topEdge.isConnected) slides.push(topEdge.animate([{ translate: '0 0' }, { translate: `0 ${open ? shift : -shift}px` }], timing));
+      folding = true;
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        // ST keeps the chat's text in place when the chat changes height (its resize observer adjusts
+        // the scroll before the next paint, in browsers with CSS field-sizing); elsewhere it's done here.
+        const stHolds = window.CSS?.supports?.('field-sizing', 'content');
+        const chatTop = chat ? chat.getBoundingClientRect().top : 0;
+        const scrolled = chat ? chat.scrollTop : 0;
+        commit();
+        const moved = chat ? chat.getBoundingClientRect().top - chatTop : 0;
+        if (!stHolds && chat) chat.scrollTop = scrolled + moved;
+        // A reading-place hold still running from a mode change keeps going from the text's new place.
+        if (heldAnchor && !heldAnchor.bottom) { heldAnchor.offset -= moved; heldAnchor.textOffset -= moved; }
+        for (const slide of slides) slide.cancel();
+        chatBar?.style.removeProperty('visibility');
+        folding = false;
+      };
+      // Animations pause while the page is hidden: the bar still settles on time.
+      Promise.all(slides.map(slide => slide.finished.catch(() => {}))).then(finish);
+      setTimeout(finish, FOLD_MS + 80);
+    }
     function animateFold(kind, open, commit) {
       if (!state.enabled || reducedMotion?.matches || typeof Element.prototype.animate !== 'function') { commit(); return; }
+      if (kind === 'top') { foldTop(open, commit); return; }
       const away = kind === 'top' ? '0 -100%' : '0 100%';
       const leaving = kind === 'top' ? 'qn-top-leaving' : 'qn-compose-leaving';
-      const point = readingPoint();
       const lines = [topEdge, bottomEdge].filter(node => node.isConnected);
       const linesBefore = lines.map(node => node.getBoundingClientRect().top);
+      const chatTop = chat ? chat.getBoundingClientRect().top : 0;
+      const scrolled = chat ? chat.scrollTop : 0;
+      const atEnd = chat ? chat.scrollHeight - chat.clientHeight - scrolled < 40 : false;
       if (!open) root.classList.add(leaving);
       commit();
+      if (chat) {
+        const chatTopNow = chat.getBoundingClientRect().top;
+        if (kind === 'top') chat.scrollTop = scrolled + (chatTopNow - chatTop);
+        else if (atEnd) chat.scrollTop = chat.scrollHeight;
+        glide(chat, (chatTop - scrolled) - (chatTopNow - chat.scrollTop));
+      }
       lines.forEach((node, i) => glide(node, linesBefore[i] - node.getBoundingClientRect().top));
-      if (point?.el.isConnected) glide(chat, point.top - point.el.getBoundingClientRect().top);
       const frames = open ? [{ translate: away, opacity: 0 }, { translate: '0 0', opacity: 1 }] : [{ translate: '0 0', opacity: 1 }, { translate: away, opacity: 0 }];
       const slides = foldBars(kind).map(bar => bar.animate(frames, { duration: FOLD_MS, easing: FOLD_EASE, fill: open ? 'none' : 'forwards' }));
       if (open) return;
@@ -453,7 +504,7 @@
       const set = open => {
         if (folding || state[key()] === open) return;
         guardUntil = performance.now() + 700;
-        animateFold(kind, open, () => { state[key()] = open; apply({ quick: true }); });
+        animateFold(kind, open, () => { state[key()] = open; applyBars(); });
       };
       // A tap flips the bar; a drag of 16px or more opens or folds it by direction.
       let startY = null;
@@ -823,6 +874,7 @@
     // moment after a mode change: hold the reading position for a short while unless the reader scrolls.
     let holdFrame = 0;
     let holdCancel = null;
+    let heldAnchor = null;
     function holdAnchor(anchor) {
       cancelAnimationFrame(holdFrame);
       holdCancel?.();
@@ -832,7 +884,8 @@
       const stop = () => { cancelAnimationFrame(holdFrame); holdCancel?.(); };
       const inputs = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
       for (const type of inputs) chat.addEventListener(type, stop, { passive: true });
-      holdCancel = () => { for (const type of inputs) chat.removeEventListener(type, stop); holdCancel = null; };
+      heldAnchor = anchor;
+      holdCancel = () => { for (const type of inputs) chat.removeEventListener(type, stop); holdCancel = null; heldAnchor = null; };
       const tick = now => {
         restoreAnchor(anchor);
         if (now < until) holdFrame = requestAnimationFrame(tick); else holdCancel?.();
@@ -841,7 +894,7 @@
     }
     let lastNames = null;
     let lastMedia = null;
-    function apply({ quick = false } = {}) {
+    function apply() {
       const anchor = captureAnchor();
       const reader = state.enabled && state.reader;
       const top = state.reader ? state.readerTop : state.top;
@@ -870,8 +923,7 @@
       if (form) form.inert = state.enabled && !compose;
       arrangeAll();
       syncSettings();
-      // A bar fold glides the page itself; everything else holds the reading place while late layout settles.
-      if (quick) restoreAnchor(anchor); else holdAnchor(anchor);
+      holdAnchor(anchor);
       titleUpdate();
       updateFavicons();
       try { window.localStorage.setItem(KEY, JSON.stringify({ ...state, v: 3 })); } catch { /* Session still works. */ }
