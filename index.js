@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.3';
+  const VERSION = '1.0.4';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -440,6 +440,11 @@
         for (const [name, value] of Object.entries(lift)) chatBar.style.setProperty(name, value, 'important');
         if (chatBarHeight) chatBar.style.setProperty('min-height', `${chatBarHeight}px`);
       }
+      // Folding, the chat only moves up once the bars are gone: until then the strip they leave
+      // would show the page background. The chat's own colour fills it (a shadow: paint only).
+      const sheld = document.getElementById('sheld');
+      const fill = [sheld, chat].map(node => node && getComputedStyle(node).backgroundColor).find(color => color && !/^rgba\(.*,\s*0\)$|^transparent$/.test(color));
+      if (!open && sheld && fill) sheld.style.setProperty('box-shadow', `0 -${shift}px 0 0 ${fill}`, 'important');
       // The bars move as one block, all by the same distance. Opening, the Chat Top Bar starts from
       // where it waits while folded and ends right under the settings bar, its place in the page.
       const offset = bar => bar === chatBar && open ? (holder?.offsetHeight || 0) - chatBar.getBoundingClientRect().top : 0;
@@ -468,6 +473,7 @@
         if (heldAnchor && !heldAnchor.bottom) { heldAnchor.offset -= moved; heldAnchor.textOffset -= moved; }
         for (const slide of slides) slide.cancel();
         for (const name of [...Object.keys(lift), 'min-height']) chatBar?.style.removeProperty(name);
+        if (!open) sheld?.style.removeProperty('box-shadow');
         folding = false;
       };
       // Animations pause while the page is hidden: the bar still settles on time.
