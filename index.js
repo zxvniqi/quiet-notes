@@ -454,7 +454,8 @@
       if (show) {
         const section = (title, rows) => rows.length ? [el('h4', { textContent: title }), el('div', { className: 'qn-toc-list' }, ...rows.map(([node, text]) => button(text, () => { showToc(false); press(node); })))] : [];
         const actions = chatActions.map(([selector, text]) => [document.querySelector(selector), text]).filter(([node]) => node);
-        const drawers = [...document.querySelectorAll('#top-settings-holder .drawer-icon')].map(node => [node, drawerNames.find(([selector]) => node.matches(selector))?.[1] || node.title || '기타']);
+        // Panels another extension has taken off the top bar (e.g. a menu arranger) stay out of the list too.
+        const drawers = [...document.querySelectorAll('#top-settings-holder .drawer-icon')].filter(node => getComputedStyle(node.closest('.drawer') || node).display !== 'none').map(node => [node, drawerNames.find(([selector]) => node.matches(selector))?.[1] || node.title || '기타']);
         toc.replaceChildren(...section('이 문서', actions), ...section('서재', drawers));
       }
       toc.hidden = !show;

@@ -347,7 +347,7 @@ html.qn-active.qn-actions-fold #chat .mes .mes_buttons {
 }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtons { display: contents !important; }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtonsHint {
-  display: inline-flex !important; align-items: center; justify-content: center; min-width: 28px; min-height: 28px; visibility: visible !important;
+  display: inline-flex !important; align-items: center; justify-content: center; visibility: visible !important;
 }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons:not(.qn-actions-open) [data-qn-menu="in"] { display: none !important; }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open {
@@ -782,3 +782,13 @@ html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container) { border
 html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container) img { border-color: transparent !important; box-shadow: none !important; outline: 0 !important; }
 html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container)::before,
 html.qn-active:not(.qn-avatars-visible) :is(.avatar, .avatar-container)::after { content: none !important; display: none !important; }
+/* Script controls (pause / stop / continue while a Quick Reply runs): quiet glyphs like the other composer buttons. */
+html.qn-active #sheld#sheld#sheld #form_sheld :is(.stscript_btn, .stscript_btn *) {
+  background-color: transparent !important; background-image: none !important; border-color: transparent !important;
+  box-shadow: none !important; filter: none !important; color: var(--qn-text) !important; -webkit-text-fill-color: currentColor !important;
+}
+html.qn-active.qn-reader #sheld#sheld#sheld #form_sheld .stscript_btn > i { animation: qn-action-pulse 1.6s ease-in-out infinite; }
+/* E-book: the shelf opens from ‹ in the reader bar, so the panel's own character-list button stays out. */
+html.qn-active.qn-reader #rm_button_characters { display: none !important; }
+/* E-book: whatever an extension puts under the text (e.g. a swipe row) keeps a little air above it. */
+html.qn-active.qn-reader #chat .mes .mes_block > .mes_text ~ * { margin-top: 16px !important; }
