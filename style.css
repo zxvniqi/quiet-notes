@@ -664,7 +664,8 @@ html.qn-active.qn-dark
 html.qn-active.qn-dark :is(body *)::before,
 html.qn-active.qn-dark :is(body *)::after { -webkit-text-fill-color: currentColor !important; }
 /* Composer buttons (every mode): no theme boxes, just the glyph. */
-html.qn-active #form_sheld :is(#leftSendForm, #rightSendForm, #nonQRFormItems) > :not(#send_textarea),
+/* Panels other extensions open from the composer row (names with "popup", e.g. Direction Manager) keep their sheet. */
+html.qn-active #form_sheld :is(#leftSendForm, #rightSendForm, #nonQRFormItems) > :not(#send_textarea):not([class*="popup"]),
 html.qn-active #form_sheld :is(.dm-compact--button, #send_but, #mes_stop, #options_button, #extensionsMenuButton) {
   background-color: transparent !important; background-image: none !important; border-color: transparent !important; box-shadow: none !important; filter: none !important; color: var(--qn-text) !important;
 }
