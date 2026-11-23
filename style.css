@@ -158,6 +158,11 @@ html.qn-active[data-qn-divider="stars"] #chat .mes:not(.last_mes):not(:last-chil
 
 /* ── Composer: colours only. Icon size and position stay the theme's. ── */
 .qn-active #form_sheld { flex: 0 0 auto; margin: 0; }
+/* The composer reaches the page edges and the bottom, whatever outer spacing or offsets a theme gives
+   it (as with the top bars): no strip of page shows beside or below it. */
+html.qn-active #sheld#sheld#sheld #form_sheld { margin: 0 !important; max-width: none !important; }
+html.qn-active.qn-compose-visible #sheld#sheld#sheld #form_sheld { inset: auto !important; }
+html.qn-active #sheld#sheld#sheld #form_sheld #send_form { margin: 0 !important; width: auto !important; max-width: none !important; }
 .qn-active #send_form { box-sizing: border-box; }
 .qn-active #send_textarea { color: var(--qn-text) !important; background: transparent !important; border: 0 !important; box-shadow: none !important; max-height: min(220px, 32dvh) !important; }
 .qn-active #send_textarea::placeholder { color: var(--qn-muted); }
