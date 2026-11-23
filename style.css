@@ -16,27 +16,27 @@ html.qn-active[data-qn-note="gray"] {
 }
 html.qn-active[data-qn-note="dark"] {
   --qn-page: #141619; --qn-bg: #1c1f23; --qn-bar: #22262b; --qn-line: #353b42; --qn-soft: #2b3036;
-  --qn-text: #d8dce1; --qn-muted: #8d97a2; --qn-div: #59616b; --qn-quote: #a2b5c9; --qn-user: #23272c;
+  --qn-text: #c9ced5; --qn-muted: #8d97a2; --qn-div: #59616b; --qn-quote: #a2b5c9; --qn-user: #23272c;
   --qn-info: #6f9bd0; --qn-success: #62ad7c; --qn-warning: #d9a344; --qn-error: #e07563;
   color-scheme: dark;
 }
 html.qn-active.qn-reader {
   --qn-page: #ebe8e1; --qn-bg: #f8f6f1; --qn-bar: #f3f1eb; --qn-line: #e2ded5; --qn-soft: #edeae3;
-  --qn-text: #34312c; --qn-muted: #88827a; --qn-div: #b7b0a5; --qn-quote: #5f5a52; --qn-user: transparent;
+  --qn-text: #34312c; --qn-muted: #6f6a62; --qn-div: #b7b0a5; --qn-quote: #5f5a52; --qn-user: transparent;
   --qn-info: #4f7397; --qn-success: #4f7e58; --qn-warning: #b07a24; --qn-error: #b04c3c;
   color-scheme: light;
 }
 html.qn-active.qn-reader[data-qn-paper="white"] {
   --qn-page: #ebebeb; --qn-bg: #ffffff; --qn-bar: #fafafa; --qn-line: #e3e3e3; --qn-soft: #f0f0f0;
-  --qn-text: #262626; --qn-muted: #858585; --qn-div: #aaaaaa; --qn-quote: #555555;
+  --qn-text: #262626; --qn-muted: #6e6e6e; --qn-div: #aaaaaa; --qn-quote: #555555;
 }
 html.qn-active.qn-reader[data-qn-paper="sepia"] {
   --qn-page: #e5dfd4; --qn-bg: #f2ede4; --qn-bar: #ece6dc; --qn-line: #ddd5c8; --qn-soft: #e8e1d6;
-  --qn-text: #473e36; --qn-muted: #887c70; --qn-div: #b3a796; --qn-quote: #61564b;
+  --qn-text: #473e36; --qn-muted: #6d6257; --qn-div: #b3a796; --qn-quote: #61564b;
 }
 html.qn-active.qn-reader[data-qn-paper="gray"] {
   --qn-page: #dee1e5; --qn-bg: #edeff1; --qn-bar: #e7e9ec; --qn-line: #d6dade; --qn-soft: #e2e5e9;
-  --qn-text: #2b2f35; --qn-muted: #6e757e; --qn-div: #a2a9b2; --qn-quote: #4b525b;
+  --qn-text: #2b2f35; --qn-muted: #646a72; --qn-div: #a2a9b2; --qn-quote: #4b525b;
 }
 html.qn-active.qn-reader[data-qn-paper="night"] {
   --qn-page: #121213; --qn-bg: #1c1c1e; --qn-bar: #232325; --qn-line: #333336; --qn-soft: #2a2a2d;
@@ -131,6 +131,13 @@ html.qn-active #chat .mes .mes_text { color: var(--qn-text); }
 .qn-active #chat .welcomeHeaderVersionDisplay > * { display: none !important; }
 .qn-active #chat .welcomeHeaderVersionDisplay::after { content: '최근 문서'; font-size: 18px; font-weight: 600; }
 .qn-active #chat :is(.mes_buttons, .extraMesButtons) { color: var(--qn-muted); }
+/* Dark sheets: theme accent colours on scroll bars and sliders give way to the sheet's greys. */
+html.qn-active.qn-dark :is(.drawer-content, .drawer-content *, #extensionsMenu, #extensionsMenu *, .popup:not(:has(#loader)) *) { scrollbar-color: var(--qn-div) transparent !important; }
+html.qn-active.qn-dark ::-webkit-scrollbar-thumb { background: var(--qn-div) !important; border-color: transparent !important; box-shadow: none !important; }
+html.qn-active.qn-dark ::-webkit-scrollbar-track { background: transparent !important; box-shadow: none !important; }
+html.qn-active.qn-dark input[type="range"] { accent-color: var(--qn-muted) !important; }
+html.qn-active.qn-dark input[type="range"]::-webkit-slider-runnable-track { background: var(--qn-soft) !important; background-image: none !important; box-shadow: none !important; }
+html.qn-active.qn-dark input[type="range"]::-webkit-slider-thumb { background: var(--qn-text) !important; background-image: none !important; border-color: var(--qn-line) !important; box-shadow: none !important; }
 /* Dark sheets: themes often write dark text and icon colours straight into their CSS.
    Controls and labels outside the message text take the sheet's light text instead. */
 html.qn-active.qn-dark
