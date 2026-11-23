@@ -138,6 +138,11 @@ html.qn-active.qn-dark
       [class*="fa-"], select, input, textarea, label, h1, h2, h3, h4, h5, h6, small, b, strong):not(.mes_text *):not(.qn-settings-body *):not(.toast *) {
   color: var(--qn-text) !important; -webkit-text-fill-color: currentColor !important; text-shadow: none !important;
 }
+/* Icon-only buttons sit a tone below the text (still well readable on the dark sheet), as on a light page. */
+html.qn-active.qn-dark
+  :is(#qn-boost#qn-boost#qn-boost, .menu_button_icon, .drawer-icon, .mes_button, i[class*="fa-"], div[class*="fa-"]:empty):not(.openIcon):not(.mes_text *):not(.qn-settings-body *):not(.toast *) {
+  color: var(--qn-muted) !important;
+}
 html.qn-active.qn-dark :is(select, input, textarea):not(.mes_text *) { background-color: var(--qn-soft) !important; }
 html.qn-active.qn-dark :is(select, input, textarea)::placeholder { color: var(--qn-muted) !important; }
 
