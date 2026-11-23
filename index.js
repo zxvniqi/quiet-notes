@@ -790,8 +790,8 @@
       for (const scope of mediaRoots) refreshShells(scope);
       for (const row of menuRows) arrangeRow(row);
       menuRows.clear();
-      // A chat opened or older messages shown: their heights are noted afresh (one message at a time,
-      // as a reply streams in, needs nothing: it is on screen and its size is remembered as it renders).
+      // A chat opened or older messages shown: everything renders once more so their sizes are remembered
+      // (one message at a time, as a reply streams in, needs nothing: it is on screen as it renders).
       if (addedMessages > 1) skim(true);
       addedMessages = 0;
       for (const node of captionRoots) markCaptions(node);
