@@ -134,9 +134,9 @@ html.qn-active #chat .mes .mes_text { color: var(--qn-text); }
 /* Dark sheets: themes often write dark text and icon colours straight into their CSS.
    Controls and labels outside the message text take the sheet's light text instead. */
 html.qn-active.qn-dark
-  :is(button, .menu_button, .menu_button_icon, .mes_button, .interactable, .drawer-icon, .list-group-item, .inline-drawer-header,
+  :is(#qn-boost#qn-boost#qn-boost, button, .menu_button, .menu_button_icon, .mes_button, .interactable, .drawer-icon, .list-group-item, .inline-drawer-header,
       [class*="fa-"], select, input, textarea, label, h1, h2, h3, h4, h5, h6, small, b, strong):not(.mes_text *):not(.qn-settings-body *):not(.toast *) {
-  color: var(--qn-text) !important; text-shadow: none !important;
+  color: var(--qn-text) !important; -webkit-text-fill-color: currentColor !important; text-shadow: none !important;
 }
 html.qn-active.qn-dark :is(select, input, textarea):not(.mes_text *) { background-color: var(--qn-soft) !important; }
 html.qn-active.qn-dark :is(select, input, textarea)::placeholder { color: var(--qn-muted) !important; }
@@ -383,6 +383,8 @@ html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open {
   html.qn-active.qn-actions-fold #chat .mes .mes_buttons.qn-actions-open { animation: none; }
 }
 
+/* Loader overlays (the startup splash and the action loader) are left out of the dark panel rules
+   (:not(:has(#loader))): the splash keeps its own startup look, the loader its see-through overlay. */
 /* ── Action loader: a thin ring in place of the gear, centred on the actual icon ── */
 html.qn-active .popup:has(#loader:not(.splash-screen) #load-spinner) {
   position: fixed !important; inset: 0 !important; margin: 0 !important; padding: 0 !important;
@@ -646,11 +648,11 @@ html.qn-active.qn-reader #form_sheld { background-color: var(--qn-bar) !importan
 /* Dark sheets, part 2: themes also paint panels and drawers light. The panels take the dark sheet,
    their inner boxes become see-through, and fields and buttons get a quiet raised colour. */
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, #options .options-content, .list-group, #qr--popout, #movingDivs > div) {
+  :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, #options .options-content, .list-group, #qr--popout, #movingDivs > div) {
   background-color: var(--qn-bar) !important; background-image: none !important; border-color: var(--qn-line) !important;
 }
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, .list-group, #extensionsMenu) :is(#qn-boost#qn-boost#qn-boost#qn-boost, .active, .selected, .toggleEnabled, [aria-selected="true"], .selected_tab):not(.qn-settings-body *) {
+  :is(.drawer-content, .popup:not(:has(#loader)), .list-group, #extensionsMenu) :is(#qn-boost#qn-boost#qn-boost#qn-boost, .active, .selected, .toggleEnabled, [aria-selected="true"], .selected_tab):not(.qn-settings-body *) {
   background-color: color-mix(in srgb, var(--qn-text) 14%, var(--qn-bar)) !important;
 }
 /* Icon glyphs drawn in ::before/::after take the element's colour too. */
@@ -663,15 +665,15 @@ html.qn-active #form_sheld :is(.dm-compact--button, #send_but, #mes_stop, #optio
 }
 /* Dark sheets, part 3: decorative pictures, gradients, glows and frames inside panels go too
    (pictures that are content, such as avatars and backgrounds, stay). */
-html.qn-active.qn-dark :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div),
-html.qn-active.qn-dark :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div) *:not(img, video, canvas, picture, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *) {
+html.qn-active.qn-dark :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div),
+html.qn-active.qn-dark :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div) *:not(img, video, canvas, picture, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *) {
   background-image: none !important; box-shadow: none !important; text-shadow: none !important; outline-color: var(--qn-line) !important;
   -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
 }
-html.qn-active.qn-dark :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div) *:not(img, video, canvas, picture, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *)::before,
-html.qn-active.qn-dark :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div) *:not(img, video, canvas, picture, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *)::after { background-image: none !important; box-shadow: none !important; }
+html.qn-active.qn-dark :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div) *:not(img, video, canvas, picture, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *)::before,
+html.qn-active.qn-dark :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div) *:not(img, video, canvas, picture, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *)::after { background-image: none !important; box-shadow: none !important; }
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group) :is(option, optgroup) { color: var(--qn-text) !important; background-color: var(--qn-bar) !important; }
+  :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group) :is(option, optgroup) { color: var(--qn-text) !important; background-color: var(--qn-bar) !important; }
 html.qn-active.qn-dark #top-settings-holder#top-settings-holder#top-settings-holder
   :is(button, .menu_button, .menu_button_icon, input, select, textarea, .text_pole, .inline-drawer-header, .inline-drawer-toggle):not(.qn-settings-body *) { border-color: var(--qn-line) !important; }
 /* Settings fields follow the dialog's own colours, not the theme's field colours. */
@@ -697,22 +699,22 @@ html.qn-active #sheld#sheld#sheld #chat .mes_text q { background-color: transpar
    above them (an :is() list weighs as its heaviest entry) without changing what they apply to. */
 html.qn-active :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *) { -webkit-text-fill-color: currentColor !important; }
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group, .inline-drawer-content, #qr--popout, #movingDivs > div, #extensionTopBar)
+  :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, .inline-drawer-content, #qr--popout, #movingDivs > div, #extensionTopBar)
   :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *):not(.qn-settings-body *):not(.toast *) { color: var(--qn-text) !important; }
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div)
+  :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div)
   :is(#qn-boost#qn-boost#qn-boost, *):not(img, video, canvas, picture, svg, svg *, input, select, textarea, button, .menu_button, .text_pole, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *) {
   background-color: transparent !important; background-image: none !important; box-shadow: none !important; text-shadow: none !important; border-color: var(--qn-line) !important;
 }
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div)
+  :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div)
   :is(#qn-boost#qn-boost#qn-boost, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea, .text_pole, button, .menu_button):not(.qn-settings-body *) {
   background-color: var(--qn-soft) !important; background-image: none !important; box-shadow: none !important; border-color: var(--qn-line) !important; color: var(--qn-text) !important;
 }
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group) :is(#qn-boost#qn-boost#qn-boost, *):not(.qn-settings-body *)::before,
+  :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group) :is(#qn-boost#qn-boost#qn-boost, *):not(.qn-settings-body *)::before,
 html.qn-active.qn-dark
-  :is(.drawer-content, .popup, dialog:not(#qn-dialog), #extensionsMenu, .options-content, .list-group) :is(#qn-boost#qn-boost#qn-boost, *):not(.qn-settings-body *)::after { color: inherit !important; }
+  :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group) :is(#qn-boost#qn-boost#qn-boost, *):not(.qn-settings-body *)::after { color: inherit !important; }
 /* Decorative layers themes hang on the chat and the composer (lace, paper, glitter overlays). */
 html.qn-active #sheld#sheld#sheld :is(#chat, #form_sheld, #send_form, #nonQRFormItems)::before,
 html.qn-active #sheld#sheld#sheld :is(#chat, #form_sheld, #send_form, #nonQRFormItems)::after,
