@@ -85,6 +85,9 @@ html.qn-active #sheld#sheld#sheld {
   max-width: 100vw !important;
   margin: 0 auto !important;
   transform: none !important;
+  /* The page column is laid out here: whatever padding or offsets a theme gives it (or the chat, see
+     below), the bars and the chat sit flush under one another. */
+  padding-top: 0 !important;
   padding-bottom: env(safe-area-inset-bottom, 0px);
   box-sizing: border-box;
   background: var(--qn-bg);
@@ -358,9 +361,8 @@ html.qn-active[data-qn-font="on"] #chat .mes .mes_text :is(p, li, blockquote, q,
    and an open row wraps onto a quiet tray. Order and hiding stay the theme's and other extensions'. ── */
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons {
   position: relative !important; display: flex !important; flex-wrap: wrap !important; align-items: center !important;
-  width: 100% !important; max-width: 100% !important; gap: 6px !important; overflow: visible !important;
-  /* The row spans the width so it can wrap: its buttons stay on the right, where ST puts them. */
-  justify-content: flex-end !important;
+  /* The row keeps the size and place the theme gives it (left or right); it only wraps when open. */
+  max-width: 100% !important; gap: 6px !important; overflow: visible !important;
 }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtons { display: contents !important; }
 html.qn-active.qn-actions-fold #chat .mes .mes_buttons > .extraMesButtonsHint {
@@ -428,9 +430,14 @@ html.qn-active #toast-container > .toast {
 }
 /* The kind shows only as a small mark in a circle: ✓ saved, ! warning, ! on red for errors, i otherwise. */
 html.qn-active #toast-container > .toast::before {
-  content: '' !important; display: block !important; flex: none; width: 18px; height: 18px; border-radius: 50%;
-  background: var(--qn-dot) var(--qn-glyph) center / 12px no-repeat;
+  content: '' !important; display: block !important; flex: none !important; width: 18px !important; height: 18px !important; border-radius: 50% !important;
+  background: var(--qn-dot) var(--qn-glyph) center / 12px no-repeat !important;
+  /* Themes decorate these spots too (positioned, moved, framed): the mark stays a plain item in the row. */
+  position: static !important; inset: auto !important; transform: none !important; translate: none !important;
+  margin: 0 !important; padding: 0 !important; border: 0 !important; box-shadow: none !important; opacity: 1 !important;
+  min-width: 0 !important; min-height: 0 !important; max-width: none !important; font-size: 0 !important; animation: none !important;
 }
+html.qn-active #toast-container > .toast::after { content: none !important; display: none !important; }
 html.qn-active #toast-container > .toast-success { --qn-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.3l2.2 2.2L9.5 3.7' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 html.qn-active #toast-container > :is(.toast-warning, .toast-error) { --qn-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 2.8v4' stroke='white' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='6' cy='9.2' r='1' fill='white'/%3E%3C/svg%3E"); }
 html.qn-active #toast-container > .toast-error { --qn-dot: var(--qn-error); }
@@ -780,7 +787,7 @@ html.qn-active:not(.qn-reader) #sheld#sheld#sheld #send_form #send_textarea {
   background-color: transparent !important; background-image: none !important; box-shadow: none !important; border-color: transparent !important; outline: 0 !important;
 }
 /* The chat page itself: no theme frame, inset glow or captions (house names, mottos, watermarks). */
-html.qn-active #sheld#sheld#sheld #chat { box-shadow: none !important; background-image: none !important; outline: 0 !important; border-color: transparent !important; }
+html.qn-active #sheld#sheld#sheld #chat { top: auto !important; bottom: auto !important; left: auto !important; right: auto !important; margin-top: 0 !important; margin-bottom: 0 !important; box-shadow: none !important; background-image: none !important; outline: 0 !important; border-color: transparent !important; }
 html.qn-active #sheld#sheld#sheld #chat::before, html.qn-active #sheld#sheld#sheld #chat::after,
 html.qn-active #sheld#sheld#sheld::before, html.qn-active #sheld#sheld#sheld::after { content: none !important; display: none !important; }
 /* No theme glow on anything around the message text, and no ornament captions on its name row and info. */
@@ -789,6 +796,10 @@ html.qn-active #sheld#sheld#sheld #chat :is(#qn-boost#qn-boost#qn-boost, *):not(
 /* Word captions a theme writes into the name row (marked by the script); wordless ornaments stay. */
 html.qn-active #sheld#sheld#sheld #chat .mes [data-qn-caption~="before"]::before,
 html.qn-active #sheld#sheld#sheld #chat .mes [data-qn-caption~="after"]::after { content: none !important; display: none !important; }
+/* Messages out of sight wait unrendered (see skim() in the script). The size is remembered while a
+   message is rendered, so it is always on, and has no effect until the message stops rendering. */
+html.qn-active #chat > .mes { contain-intrinsic-size: auto 600px; }
+html.qn-active.qn-skim #chat > .mes:not(.last_mes) { content-visibility: auto; }
 /* Messages sit one after another; the gap between them is the message's own padding (and the divider),
    not the theme's card spacing. */
 html.qn-active #sheld#sheld#sheld #chat .mes { margin-top: 0 !important; margin-bottom: 0 !important; }

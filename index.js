@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.0.4';
+  const VERSION = '1.0.5';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -234,8 +234,8 @@
     function arrangeRow(row) {
       const { hint, box } = rowParts(row);
       if (!hint || !box) return;
-      // Some themes show the ··· box's buttons only once ST marks the box open (.visible). While the
-      // row is laid out here, the box always carries that mark; it comes off again with the mode.
+      // Some themes show the ··· box's buttons only once ST marks the box open (.visible). While the row
+      // is folded here, the box always carries that mark; unfolded, the row is left to ST and the theme.
       if (menuActive()) {
         if (!box.classList.contains('visible')) { box.classList.add('visible'); box.setAttribute('data-qn-visible', ''); }
       } else if (box.hasAttribute('data-qn-visible')) {
@@ -751,6 +751,7 @@
     blueObserver.observe(document.body, {attributes: true, attributeFilter: ['class']});
     const menuRows = new Set();
     const captionRoots = new Set();
+    let addedMessages = 0;
     const actionsObserver = new MutationObserver(records => {
       if (!state.enabled) return;
       const mediaRoots = new Set();
@@ -783,11 +784,16 @@
           if (row) menuRows.add(row);
           else node.querySelectorAll('.mes_buttons').forEach(found => menuRows.add(found));
           if (node.matches('.mes, .ch_name') || node.querySelector('.ch_name')) captionRoots.add(node);
+          if (node.matches('#chat > .mes')) addedMessages++;
         }
       }
       for (const scope of mediaRoots) refreshShells(scope);
       for (const row of menuRows) arrangeRow(row);
       menuRows.clear();
+      // A chat opened or older messages shown: their heights are noted afresh (one message at a time,
+      // as a reply streams in, needs nothing: it is on screen and its size is remembered as it renders).
+      if (addedMessages > 1) skim(true);
+      addedMessages = 0;
       for (const node of captionRoots) markCaptions(node);
       captionRoots.clear();
     });
@@ -811,10 +817,18 @@
         toggle.setAttribute('aria-expanded', 'true');
       }
     }, {capture: true, signal: abort.signal});
+    // An open message row folds on a tap elsewhere, not on a scroll: a press only counts if the finger
+    // lifts again close to where it went down.
+    let pressAt = null;
     document.addEventListener('pointerdown', e => {
-      if (openActions && !openActions.contains(e.target)) closeActions();
+      pressAt = openActions && !openActions.contains(e.target) ? { x: e.clientX, y: e.clientY } : null;
       if (!toc.hidden && !toc.contains(e.target) && !readerBar.contains(e.target)) showToc(false);
     }, {signal: abort.signal});
+    document.addEventListener('pointerup', e => {
+      if (pressAt && openActions && !openActions.contains(e.target) && Math.hypot(e.clientX - pressAt.x, e.clientY - pressAt.y) < 10) closeActions();
+      pressAt = null;
+    }, {signal: abort.signal});
+    document.addEventListener('pointercancel', () => { pressAt = null; }, {signal: abort.signal});
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') { closeActions(); showToc(false); openDialog(false); }
       if (e.ctrlKey && e.shiftKey && e.code === 'KeyM' && !e.repeat) { e.preventDefault(); toggleMode(); }
@@ -925,6 +939,7 @@
       mountEdges();
       arrangeAll();
       markCaptions();
+      skim(false);
       const form = document.getElementById('form_sheld');
       if (form) form.inert = false;
       for (const node of [dialog, readerBar, toc, wandContainer, settingsPanel]) node.remove();
@@ -985,6 +1000,23 @@
     }
     let lastNames = null;
     let lastMedia = null;
+    // Messages out of sight are left unrendered (content-visibility), which keeps long chats light:
+    // restyling or relaying out the page then only touches what is on screen. While rendered, every
+    // message has its size remembered by the browser (contain-intrinsic-size: auto, see the stylesheet),
+    // so one waiting unrendered keeps its true height and the scroll bar and reading place stay put.
+    // A mode or look change (or a chat opening) lifts this until the new layout has rendered once.
+    let skimTimer = 0;
+    let skimTurn = 0;
+    function skim(on) {
+      clearTimeout(skimTimer);
+      const turn = ++skimTurn; // a later call (or the mode going off) cancels a pending one
+      root.classList.remove('qn-skim');
+      if (!on || !chat) return;
+      // Sizes are remembered as frames render: two frames must pass with everything shown first.
+      skimTimer = setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (turn === skimTurn && state.enabled) root.classList.add('qn-skim');
+      })), 1200);
+    }
     let lastCaptions = false;
     function apply() {
       const anchor = captureAnchor();
@@ -1017,6 +1049,7 @@
       if (lastCaptions !== state.enabled) { markCaptions(chat, true); lastCaptions = state.enabled; }
       syncSettings();
       holdAnchor(anchor);
+      skim(state.enabled);
       titleUpdate();
       updateFavicons();
       try { window.localStorage.setItem(KEY, JSON.stringify({ ...state, v: 3 })); } catch { /* Session still works. */ }
