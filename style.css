@@ -740,8 +740,10 @@ html.qn-active #top-settings-holder#top-settings-holder#top-settings-holder .dra
 html.qn-active.qn-dark :is(#stqa_floating_panel, #stqa_floating_panel *) {
   background-image: none !important; box-shadow: none !important; text-shadow: none !important; color: var(--qn-text) !important; -webkit-text-fill-color: currentColor !important; border-color: var(--qn-line) !important;
 }
-html.qn-active.qn-dark #stqa_floating_panel :is(.stqa_floating_button) { background-color: var(--qn-soft) !important; }
-html.qn-active.qn-dark #stqa_floating_panel { background-color: var(--qn-bar) !important; }
+/* Only while it floats over the chat: docked inside the composer (.stqa_in_flow) it takes the composer's
+   look, the same as on a light page. */
+html.qn-active.qn-dark #stqa_floating_panel:not(.stqa_in_flow) :is(.stqa_floating_button) { background-color: var(--qn-soft) !important; }
+html.qn-active.qn-dark #stqa_floating_panel:not(.stqa_in_flow) { background-color: var(--qn-bar) !important; }
 /* Icon glyphs (Font Awesome and the line icons) follow their button's colour even when a theme colours ::before. */
 /* One selector per bar (not an :is() list of them): the browser can then pass over every element
    that isn't inside one of these bars without testing it. */
