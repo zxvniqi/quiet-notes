@@ -1,5 +1,5 @@
 @import url('./icons.css?v=1.0.0');
-:root { --qn-css: "1.1.3"; }
+:root { --qn-css: "1.1.4"; }
 /* Quiet Notes. Scoped to qn-active; disabling restores the existing theme.
    No font-family is set anywhere: the theme's own fonts are kept. */
 
@@ -874,96 +874,167 @@ html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boos
 html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .toggleEnabled, .toggleEnabled > i):not(.qn-settings-body *) { color: var(--qn-success) !important; }
 html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .avatar-container.selected) { border-color: var(--qn-text) !important; }
 
-/* ══ E-book start screen: the recent chats as books on a shelf. The character is the title (printed
-   on the cover too), the chat's last lines are the blurb, the message count its pages. ══ */
-html.qn-active.qn-reader #chat .welcomePanel { padding: 28px 0 0 !important; gap: 0 !important; background: transparent !important; border: 0 !important; }
+/* ══ Start screen (no chat open): the recent chats as a shelf of books (e-book) or a list of documents
+   (normal mode). The character is the title; ST's file name shows only when it was given by hand.
+   Each row's own buttons (pin, rename, delete) wait in a small menu behind ⋮. ══ */
+html.qn-active #chat .welcomePanel { padding: 28px 0 0 !important; gap: 0 !important; background: transparent !important; border: 0 !important; }
 html.qn-active.qn-reader #chat .welcomeHeaderVersionDisplay::after { content: '최근 읽은 책'; }
-html.qn-active.qn-reader #chat .welcomePanel :is(.recentChatsTitle, .welcomeShortcuts > a, .welcomeShortcutsSeparator) { display: none !important; }
-html.qn-active.qn-reader #chat .welcomePanel .recentChatList { gap: 0 !important; }
+html.qn-active #chat .welcomePanel :is(.recentChatsTitle, .welcomeShortcuts > a, .welcomeShortcutsSeparator) { display: none !important; }
+/* The heading: a rule under the title, and quiet marks for its buttons (settings, fold, unfold). */
+html.qn-active #chat .welcomePanel .welcomeHeaderTitle { gap: 0 !important; padding: 6px 0 8px 2px !important; border-bottom: 1px solid var(--qn-div) !important; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .welcomeHeaderTitle :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .mes_button) {
+  width: 34px; height: 34px; line-height: 34px !important; text-align: center; border-radius: 50%;
+  color: var(--qn-muted) !important; background-color: transparent !important; opacity: 1 !important; filter: none !important;
+}
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .welcomeHeaderTitle .mes_button:active { background-color: var(--qn-soft) !important; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .welcomeHeaderTitle .mes_button > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i) {
+  font-size: 14px !important; line-height: inherit !important; vertical-align: baseline !important; color: inherit !important;
+}
+html.qn-active #chat .welcomePanel .hideRecentChats > i::before { content: '\f077' !important; }
+html.qn-active #chat .welcomePanel .showRecentChats > i::before { content: '\f078' !important; }
+/* A temporary chat: an empty place at the end of the list. */
+html.qn-active #chat .welcomePanel .welcomeHeader { order: 3; padding: 14px 0 6px !important; }
+html.qn-active #chat .welcomePanel .welcomeShortcuts { width: 100%; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .openTemporaryChat) {
+  width: 100%; min-height: 46px; margin: 0 !important; justify-content: center; gap: 8px; font-size: 13px !important;
+  border: 1px dashed var(--qn-div) !important; border-radius: 6px !important; background-color: transparent !important; color: var(--qn-muted) !important;
+}
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .openTemporaryChat > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i, span) { color: inherit !important; }
+html.qn-active #chat .welcomePanel .openTemporaryChat > i::before { content: '\2b' !important; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .openTemporaryChat:active { background-color: var(--qn-soft) !important; }
+html.qn-active #chat .welcomePanel .openTemporaryChat > span { font-size: 0 !important; }
+html.qn-active #chat .welcomePanel .openTemporaryChat > span::after { content: '빈 문서'; font-size: 13px; }
+html.qn-active.qn-reader #chat .welcomePanel .openTemporaryChat > span::after { content: '빈 노트'; }
+html.qn-active #chat .welcomePanel .showMoreChats { margin-top: 6px; border: 0 !important; background-color: transparent !important; color: var(--qn-muted) !important; }
+html.qn-active #chat .welcomePanel .noRecentChat { color: var(--qn-muted) !important; padding: 28px 0 !important; }
+
+/* Rows, both modes. */
+html.qn-active #chat .welcomePanel .recentChatList { gap: 0 !important; }
+html.qn-active #chat .welcomePanel .recentChat {
+  display: grid !important; border: 0 !important; border-radius: 0 !important; background: transparent !important;
+}
+html.qn-active #chat .welcomePanel .recentChat.hidden { display: none !important; }
+html.qn-active #chat .welcomePanel .recentChatInfo { display: grid !important; min-width: 0; overflow: visible !important; align-self: stretch !important; }
+html.qn-active #chat .welcomePanel :is(.chatNameContainer, .chatMessageContainer) { display: contents !important; }
+html.qn-active #chat .welcomePanel .chatName { grid-area: 1 / 1; min-width: 0; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis; }
+html.qn-active #chat .welcomePanel .chatName > .characterName { font-size: 14.5px !important; font-weight: 700 !important; color: var(--qn-text) !important; }
+html.qn-active #chat .welcomePanel .chatName > span:not(:last-child) { display: none !important; }
+html.qn-active #chat .welcomePanel .chatName > span:last-child { margin-left: 6px; font-size: 11.5px !important; font-weight: 400; color: var(--qn-muted) !important; }
+html.qn-active #chat .welcomePanel .recentChat[data-qn-plain] .chatName > span:last-child { display: none !important; }
+html.qn-active #chat .welcomePanel .chatMessage { color: var(--qn-muted) !important; overflow-wrap: anywhere; }
+html.qn-active #chat .welcomePanel .chatStats :is(.fileSize, .counterBlock > i) { display: none !important; }
+html.qn-active #chat .welcomePanel .chatStats .counterBlock::after { content: none !important; display: none !important; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .chatDate, .chatStats) { font-size: 11px !important; color: var(--qn-muted) !important; white-space: nowrap; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatStats :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, small) { font-size: inherit !important; color: inherit !important; }
+
+/* ── E-book: the book being read stands large on top; the rest of the shelf in short rows. ── */
 html.qn-active.qn-reader #chat .welcomePanel .recentChat {
   --qn-cover: #6b7f94;
-  display: grid !important; grid-template-columns: 62px minmax(0, 1fr); column-gap: 16px; align-items: start !important;
-  padding: 16px 2px !important; border: 0 !important; border-bottom: 1px solid var(--qn-line) !important; border-radius: 0 !important;
-  background: transparent !important;
+  grid-template-columns: 34px minmax(0, 1fr); column-gap: 12px; align-items: center !important;
+  padding: 10px 30px 10px 2px !important; border-bottom: 1px solid var(--qn-line) !important;
 }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat.hidden { display: none !important; }
 html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="1"] { --qn-cover: #8a6f5c; }
 html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="2"] { --qn-cover: #5f7d6b; }
 html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="3"] { --qn-cover: #8c5a5a; }
 html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="4"] { --qn-cover: #7a6a8c; }
 html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="5"] { --qn-cover: #9a854f; }
-/* The cover: a spine shade down the left, the title in small print. */
+html.qn-active.qn-reader #chat .welcomePanel .recentChat > .avatar { display: none !important; }
+/* The cover: a spine shade down the left. The large one carries the title in small print. */
 html.qn-active.qn-reader #chat .welcomePanel .recentChat::before {
   content: attr(data-qn-title) !important; display: block !important; position: static !important; box-sizing: border-box;
-  width: 62px; height: 88px; padding: 11px 6px 6px 12px; overflow: hidden; border-radius: 2px 4px 4px 2px;
-  background: linear-gradient(90deg, #00000038 0 5px, #ffffff24 5px 6px, transparent 6px), var(--qn-cover);
-  color: #fffffff0; -webkit-text-fill-color: currentColor; font-size: 10.5px; font-weight: 600; line-height: 1.35; text-align: left;
+  width: 34px; height: 48px; overflow: hidden; border-radius: 2px 3px 3px 2px;
+  background: linear-gradient(90deg, #00000038 0 3px, #ffffff24 3px 4px, transparent 4px), var(--qn-cover);
+  color: #fffffff0; -webkit-text-fill-color: currentColor; font-size: 0; font-weight: 600; line-height: 1.35; text-align: left;
   word-break: break-all; box-shadow: 1px 2px 5px #00000029;
 }
 html.qn-active.qn-reader.qn-dark #chat .welcomePanel .recentChat::before { filter: brightness(.82); }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat > .avatar { display: none !important; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChatInfo { grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; row-gap: 1px; align-items: center; }
+html.qn-active.qn-reader #chat .welcomePanel .chatMessage { grid-area: 2 / 1; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; font-size: 12px !important; line-height: 1.5 !important; }
+html.qn-active.qn-reader #chat .welcomePanel .chatStats { grid-area: 1 / 2 / 3 / 3; align-self: center !important; }
+html.qn-active.qn-reader #chat .welcomePanel .chatStats .counterBlock > small::after { content: '쪽'; }
+html.qn-active.qn-reader #chat .welcomePanel .chatDate { display: none !important; }
 /* A pinned book wears a ribbon over its cover. */
 html.qn-active.qn-reader #chat .welcomePanel .recentChat > .recentChatPinned {
-  position: absolute !important; top: 16px !important; left: 46px !important; width: 9px; height: 20px; opacity: 1 !important;
+  position: absolute !important; top: 10px !important; left: 26px !important; width: 6px; height: 13px; opacity: 1 !important;
   background: var(--qn-error) !important; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); font-size: 0 !important;
 }
 html.qn-active.qn-reader #chat .welcomePanel .recentChat > .recentChatPinned > * { display: none !important; }
-/* Title on top, the blurb under it, then a quiet line: date · pages on the left, the book's buttons on the right. */
-html.qn-active.qn-reader #chat .welcomePanel .recentChatInfo {
-  display: grid !important; grid-template-columns: auto auto minmax(0, 1fr); grid-template-rows: auto 1fr auto; align-items: center;
-  column-gap: 8px; row-gap: 4px; min-height: 88px; align-self: stretch !important; overflow: visible !important;
+/* The first book. */
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child {
+  grid-template-columns: 92px minmax(0, 1fr); column-gap: 16px; align-items: start !important;
+  padding: 18px 30px 16px 2px !important; border-bottom: 0 !important;
 }
-html.qn-active.qn-reader #chat .welcomePanel :is(.chatNameContainer, .chatMessageContainer) { display: contents !important; }
-html.qn-active.qn-reader #chat .welcomePanel .chatName {
-  grid-area: 1 / 1 / 2 / -1; display: flex !important; flex-direction: column; gap: 1px; min-width: 0; white-space: nowrap !important; overflow: hidden !important;
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child::before {
+  width: 92px; height: 130px; padding: 14px 8px 8px 16px; font-size: 13px; border-radius: 2px 5px 5px 2px;
+  background: linear-gradient(90deg, #00000038 0 6px, #ffffff24 6px 7px, transparent 7px), var(--qn-cover);
 }
-html.qn-active.qn-reader #chat .welcomePanel .chatName > .characterName {
-  font-size: 16px !important; font-weight: 700 !important; line-height: 1.35 !important; color: var(--qn-text) !important; overflow: hidden; text-overflow: ellipsis;
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child::after {
+  content: '책장'; grid-column: 1 / -1; margin: 18px -30px 0 0; padding: 14px 0 0; border-top: 1px solid var(--qn-line);
+  font-size: 11px; font-weight: 600; letter-spacing: .14em; color: var(--qn-muted);
 }
-html.qn-active.qn-reader #chat .welcomePanel .chatName > span:not(:last-child) { display: none !important; }
-html.qn-active.qn-reader #chat .welcomePanel .chatName > span:last-child { font-size: 11.5px !important; color: var(--qn-muted) !important; overflow: hidden; text-overflow: ellipsis; }
-html.qn-active.qn-reader #chat .welcomePanel .chatMessage {
-  grid-area: 2 / 1 / 3 / -1; align-self: start; -webkit-line-clamp: 3 !important; line-clamp: 3 !important;
-  font-size: 13px !important; line-height: 1.55 !important; color: var(--qn-muted) !important; overflow-wrap: anywhere;
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child:not(:has(~ .recentChat:not(.hidden)))::after { display: none; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child > .recentChatPinned { top: 18px !important; left: 78px !important; width: 9px; height: 20px; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .recentChatInfo {
+  grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; row-gap: 0; align-items: start; min-height: 130px;
 }
-html.qn-active.qn-reader #chat .welcomePanel .chatDate { grid-area: 3 / 1; font-size: 11.5px !important; color: var(--qn-muted) !important; white-space: nowrap; }
-html.qn-active.qn-reader #chat .welcomePanel .chatStats { grid-area: 3 / 2; align-self: center !important; font-size: 11.5px !important; color: var(--qn-muted) !important; white-space: nowrap; }
-html.qn-active.qn-reader #chat .welcomePanel .chatStats :is(.fileSize, .counterBlock > i) { display: none !important; }
-html.qn-active.qn-reader #chat .welcomePanel .chatStats .counterBlock { gap: 0 !important; }
-html.qn-active.qn-reader #chat .welcomePanel .chatStats .counterBlock::before { content: '·'; margin-right: 8px; }
-html.qn-active.qn-reader #chat .welcomePanel .chatStats .counterBlock::after { content: none !important; display: none !important; }
-html.qn-active.qn-reader #chat .welcomePanel .chatStats .counterBlock > small { font-size: inherit !important; }
-html.qn-active.qn-reader #chat .welcomePanel .chatStats .counterBlock > small::after { content: '쪽'; }
-html.qn-active.qn-reader #chat .welcomePanel .chatActions { grid-area: 3 / 3; justify-self: end; gap: 2px !important; }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .chatActions :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, button) {
-  min-width: 30px; min-height: 30px; padding: 0 !important; border: 0 !important; background-color: transparent !important; color: var(--qn-muted) !important; opacity: .8;
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatName { display: flex !important; flex-direction: column; white-space: normal !important; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatName::before { content: '이어 읽기'; font-size: 11px; letter-spacing: .08em; color: var(--qn-muted); }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatName > .characterName { font-size: 18px !important; line-height: 1.35 !important; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatName > span:last-child { margin-left: 0; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatMessage {
+  grid-area: 2 / 1; margin-top: 5px; -webkit-line-clamp: 3 !important; line-clamp: 3 !important; font-size: 12.5px !important; line-height: 1.55 !important;
 }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .chatActions :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .pinChat.active, .pinChat.active > i) { color: var(--qn-error) !important; opacity: 1; }
-html.qn-active.qn-reader #chat .welcomePanel .showMoreChats { margin-top: 6px; border: 0 !important; background-color: transparent !important; color: var(--qn-muted) !important; }
-html.qn-active.qn-reader #chat .welcomePanel .noRecentChat { color: var(--qn-muted) !important; padding: 28px 0 !important; }
-/* The shelf's heading: a rule under the title, and quiet marks for its buttons (settings, fold, unfold). */
-html.qn-active.qn-reader #chat .welcomePanel .welcomeHeaderTitle { gap: 0 !important; padding: 6px 0 8px 2px !important; border-bottom: 1px solid var(--qn-div) !important; }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .welcomeHeaderTitle :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .mes_button) {
-  width: 34px; height: 34px; line-height: 34px !important; text-align: center; border-radius: 50%;
-  color: var(--qn-muted) !important; background-color: transparent !important; opacity: 1 !important; filter: none !important;
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatStats { grid-area: 3 / 1; justify-self: start; align-self: start !important; margin-top: 9px; }
+html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .recentChat:first-child .chatStats :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .counterBlock) {
+  padding: 4px 14px; border: 1px solid var(--qn-text); border-radius: 999px; color: var(--qn-text) !important; font-size: 12px !important; font-weight: 600;
 }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .welcomeHeaderTitle .mes_button:active { background-color: var(--qn-soft) !important; }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .welcomeHeaderTitle .mes_button > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i) {
-  font-size: 14px !important; line-height: inherit !important; vertical-align: baseline !important; color: inherit !important;
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatStats .counterBlock > small::after { content: '쪽부터 ›'; }
+
+/* ── Normal mode: a list of documents. ── */
+html.qn-active:not(.qn-reader) #chat .welcomePanel .recentChat {
+  grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: start !important;
+  padding: 12px 30px 12px 2px !important; border-bottom: 1px solid var(--qn-soft) !important;
 }
-html.qn-active.qn-reader #chat .welcomePanel .hideRecentChats > i::before { content: '\f077' !important; }
-html.qn-active.qn-reader #chat .welcomePanel .showRecentChats > i::before { content: '\f078' !important; }
-/* A temporary chat: an empty place at the end of the shelf. */
-html.qn-active.qn-reader #chat .welcomePanel .welcomeHeader { order: 3; padding: 14px 0 6px !important; }
-html.qn-active.qn-reader #chat .welcomePanel .welcomeShortcuts { width: 100%; }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .openTemporaryChat) {
-  width: 100%; min-height: 46px; margin: 0 !important; justify-content: center; gap: 8px; font-size: 13px !important;
-  border: 1px dashed var(--qn-div) !important; border-radius: 6px !important; background-color: transparent !important; color: var(--qn-muted) !important;
+html.qn-active:not(.qn-reader):not(.qn-avatars-visible) #chat .welcomePanel .recentChat > .avatar { display: none !important; }
+html.qn-active:not(.qn-reader):not(.qn-avatars-visible) #chat .welcomePanel .recentChat::before {
+  content: '' !important; display: block !important; position: static !important; box-sizing: border-box; width: 28px; height: 36px; margin-top: 2px;
+  border: 1.5px solid var(--qn-div); border-radius: 3px;
+  background: linear-gradient(var(--qn-div), var(--qn-div)) 5px 8px / 15px 1.5px no-repeat, linear-gradient(var(--qn-div), var(--qn-div)) 5px 14px / 15px 1.5px no-repeat,
+    linear-gradient(var(--qn-div), var(--qn-div)) 5px 20px / 9px 1.5px no-repeat;
 }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .openTemporaryChat > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i, span) { color: inherit !important; }
-html.qn-active.qn-reader #chat .welcomePanel .openTemporaryChat > i::before { content: '\2b' !important; }
-html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .openTemporaryChat:active { background-color: var(--qn-soft) !important; }
-/* A chat with ST's default file name has no subtitle; the temporary chat is "an empty note". */
-html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-plain] .chatName > span:last-child { display: none !important; }
-html.qn-active.qn-reader #chat .welcomePanel .openTemporaryChat > span { font-size: 0 !important; }
-html.qn-active.qn-reader #chat .welcomePanel .openTemporaryChat > span::after { content: '빈 노트'; font-size: 13px; }
+html.qn-active:not(.qn-reader) #chat .welcomePanel .recentChatInfo { grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; row-gap: 2px; align-items: center; }
+html.qn-active:not(.qn-reader) #chat .welcomePanel .chatDate { grid-area: 1 / 2; }
+html.qn-active:not(.qn-reader) #chat .welcomePanel .chatMessage { grid-area: 2 / 1 / 3 / -1; -webkit-line-clamp: 2 !important; line-clamp: 2 !important; font-size: 12.5px !important; line-height: 1.5 !important; }
+html.qn-active:not(.qn-reader) #chat .welcomePanel .chatStats { display: none !important; }
+html.qn-active:not(.qn-reader) #sheld#sheld#sheld #chat .welcomePanel .recentChatPinned :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i) { color: var(--qn-muted) !important; }
+
+/* ── ⋮ and its menu (added by the script). ── */
+.qn-more { display: none; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .recentChat > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .qn-more) {
+  all: unset; box-sizing: border-box; position: absolute; top: 6px; right: -6px; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  color: var(--qn-muted) !important; -webkit-text-fill-color: currentColor !important; font-size: 17px; line-height: 1; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .recentChat:first-child > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .qn-more) { top: 12px; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .recentChat > .qn-more:is(:active, :focus-visible) { background-color: var(--qn-soft) !important; }
+html.qn-active #chat .welcomePanel .chatActions { display: none !important; }
+html.qn-active #chat .welcomePanel .recentChat.qn-more-open { z-index: 5; }
+html.qn-active #chat .welcomePanel .recentChat.qn-more-open .chatActions {
+  display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 0 !important;
+  position: absolute; top: 40px; right: 0; z-index: 6; min-width: 150px; padding: 4px;
+  background: var(--qn-bg) !important; border: 1px solid var(--qn-line) !important; border-radius: 10px; box-shadow: 0 6px 20px #0000002e !important;
+}
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child.qn-more-open .chatActions { top: 46px; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, button) {
+  display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; min-height: 40px; margin: 0 !important; padding: 0 12px !important;
+  border: 0 !important; border-radius: 6px !important; background-color: transparent !important; color: var(--qn-text) !important;
+  font-size: 13px !important; white-space: nowrap; opacity: 1 !important;
+}
+html.qn-active #chat .welcomePanel .chatActions button::after { content: attr(title); }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions button:active { background-color: var(--qn-soft) !important; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions button > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i) { color: var(--qn-muted) !important; font-size: 13px !important; }
+html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions .pinChat.active > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i) { color: var(--qn-error) !important; }
+/* In the short shelf rows ⋮ sits level with the page count. */
+html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .recentChat:not(:first-child) > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .qn-more) { top: calc(50% - 17px); }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:not(:first-child).qn-more-open .chatActions { top: calc(50% + 17px); }
+/* Normal mode: the chat has no side margin of its own, so the list keeps one. */
+html.qn-active:not(.qn-reader) #chat .welcomePanel { padding: 28px 16px 0 !important; }

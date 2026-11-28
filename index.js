@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.1.3';
+  const VERSION = '1.1.4';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -267,7 +267,31 @@
         if (parts.length) node.setAttribute('data-qn-caption', parts.join(' '));
       }
     }
-    // E-book start screen: every recent chat is a book, its cover printed with the character's name.
+    // Start screen: every recent chat is a book (e-book) or a document (normal mode). Its own buttons
+    // (pin, rename, delete) stay ST's; they wait in a small menu that ⋮ opens.
+    let openMore = null;
+    function closeMore() {
+      if (!openMore) return;
+      openMore.classList.remove('qn-more-open');
+      openMore.querySelector('.qn-more')?.setAttribute('aria-expanded', 'false');
+      openMore = null;
+    }
+    function moreButton(book) {
+      const more = el('button', { type: 'button', className: 'qn-more', textContent: '⋮', title: '더 보기' });
+      more.setAttribute('aria-label', '더 보기');
+      more.setAttribute('aria-expanded', 'false');
+      // The row itself opens the chat on a press: ⋮ keeps its presses to itself.
+      more.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        const wasOpen = openMore === book;
+        closeMore();
+        if (wasOpen) return;
+        openMore = book;
+        book.classList.add('qn-more-open');
+        more.setAttribute('aria-expanded', 'true');
+      });
+      return more;
+    }
     const defaultChatName = /\d{4}-\d{1,2}-\d{1,2}\s*@\s*\d{1,2}h\s*\d{1,2}m/;
     function markShelf(scope = chat) {
       if (!scope || !state.enabled) return;
@@ -283,6 +307,7 @@
         // A chat still carrying the name ST gave it ("name - 2026-11-23@07h05m52s") shows no subtitle.
         const file = book.querySelector('.chatName > span:last-child')?.textContent || '';
         book.toggleAttribute('data-qn-plain', defaultChatName.test(file));
+        if (!book.querySelector(':scope > .qn-more')) book.append(moreButton(book));
       }
     }
     // Two zones of icon chips, like the message's own row and its ··· menu; a tap moves a button across.
@@ -854,14 +879,16 @@
     document.addEventListener('pointerdown', e => {
       pressAt = openActions && !openActions.contains(e.target) ? { x: e.clientX, y: e.clientY } : null;
       if (!toc.hidden && !toc.contains(e.target) && !readerBar.contains(e.target)) showToc(false);
+      if (openMore && !e.target.closest?.('.qn-more, .chatActions')) closeMore();
     }, {signal: abort.signal});
+    chat?.addEventListener('click', e => { if (openMore && e.target.closest?.('.chatActions')) closeMore(); }, {signal: abort.signal});
     document.addEventListener('pointerup', e => {
       if (pressAt && openActions && !openActions.contains(e.target) && Math.hypot(e.clientX - pressAt.x, e.clientY - pressAt.y) < 10) closeActions();
       pressAt = null;
     }, {signal: abort.signal});
     document.addEventListener('pointercancel', () => { pressAt = null; }, {signal: abort.signal});
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') { closeActions(); showToc(false); openDialog(false); }
+      if (e.key === 'Escape') { closeActions(); closeMore(); showToc(false); openDialog(false); }
       if (e.ctrlKey && e.shiftKey && e.code === 'KeyM' && !e.repeat) { e.preventDefault(); toggleMode(); }
     }, {signal: abort.signal});
     // E-book footer shows only the reading position, like a reader app's page indicator.
@@ -966,6 +993,8 @@
       blueObserver.disconnect();
       barObserver.disconnect();
       closeActions();
+      closeMore();
+      chat?.querySelectorAll('.welcomePanel .qn-more').forEach(node => node.remove());
       state.enabled = false;
       mountEdges();
       arrangeAll();
@@ -1092,6 +1121,7 @@
       const form = document.getElementById('form_sheld');
       if (form) form.inert = state.enabled && !compose;
       arrangeAll();
+      if (!state.enabled) closeMore();
       markShelf();
       syncShortcutTint();
       if (lastCaptions !== state.enabled) { markCaptions(chat, true); lastCaptions = state.enabled; }
