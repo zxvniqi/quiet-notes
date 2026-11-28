@@ -1,5 +1,5 @@
 @import url('./icons.css?v=1.0.0');
-:root { --qn-css: "1.1.6"; }
+:root { --qn-css: "1.2.0"; }
 /* Quiet Notes. Scoped to qn-active; disabling restores the existing theme.
    No font-family is set anywhere: the theme's own fonts are kept. */
 
@@ -1051,9 +1051,9 @@ html.qn-active #qn-row-menu#qn-row-menu#qn-row-menu#qn-row-menu > button.qn-on >
    green for "on", red for "off" and danger. (The dark rules above give everything the sheet's text colour.) ── */
 html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .fav_on, .ch_fav_icon, .is_fav .ch_name, .warning, .neutral_warning,
     #bg_selection_mode_button.active, #bulkEditButton.bulk_edit_overlay_active, [data-cc-toggle="false"] > .icon-unsupported):not(.qn-settings-body *) { color: var(--qn-warning) !important; }
-html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .world_set, .success:not(.online_status_indicator), .toggle_enable, .extension_name.update_available,
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .world_set, .success:not(.online_status_indicator), .extensions_info .toggle_enable, .extension_name.update_available,
     [data-cc-toggle="true"] > .icon-supported, label[for="bind_preset_to_connection"]:has(input:checked)):not(.qn-settings-body *) { color: var(--qn-success) !important; }
-html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .failure, .text_danger, .caution, .menu_button.togglable:not(.toggleEnabled),
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .failure, .text_danger, #completion_prompt_manager .caution, .menu_button.togglable:not(.toggleEnabled),
     #character_context_menu_delete):not(.qn-settings-body *) { color: var(--qn-error) !important; }
 html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .menu_button.toggleable.toggled)::before { color: var(--qn-success) !important; }
 html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .menu_button.toggleable.toggled) { border-color: var(--qn-success) !important; }

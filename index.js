@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.1.6';
+  const VERSION = '1.2.0';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -267,9 +267,10 @@
         if (parts.length) node.setAttribute('data-qn-caption', parts.join(' '));
       }
     }
+    // A test version kept reading places here; nothing reads them any more.
+    try { window.localStorage.removeItem(KEY + '.places'); } catch { /* Nothing to tidy. */ }
     // Start screen: every recent chat is a book (e-book) or a document (normal mode). Its own buttons
     // (pin, rename, delete) stay ST's; they wait in a small menu that ⋮ opens.
-    try { window.localStorage.removeItem(KEY + '.places'); } catch { /* Nothing to tidy. */ }
     const rowMenu = el('div', { id: 'qn-row-menu', hidden: true });
     rowMenu.setAttribute('role', 'menu');
     document.body.append(rowMenu);
@@ -870,7 +871,7 @@
           else node.querySelectorAll('.mes_buttons').forEach(found => menuRows.add(found));
           if (node.matches('.mes, .ch_name') || node.querySelector('.ch_name')) captionRoots.add(node);
           if (node.matches('#chat > .mes')) addedMessages++;
-          if (node.matches('.welcomePanel, .recentChat') || node.querySelector('.recentChat')) markShelf(node.closest('.welcomePanel') || node);
+          if (node.matches('.welcomePanel, .recentChat') || node.querySelector('.recentChat')) { closeMore(); markShelf(node.closest('.welcomePanel') || node); }
         }
       }
       for (const scope of mediaRoots) refreshShells(scope);
@@ -916,6 +917,7 @@
       pressAt = null;
     }, {signal: abort.signal});
     document.addEventListener('pointercancel', () => { pressAt = null; }, {signal: abort.signal});
+    window.addEventListener('resize', closeMore, {signal: abort.signal});
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') { closeActions(); closeMore(); showToc(false); openDialog(false); }
       if (e.ctrlKey && e.shiftKey && e.code === 'KeyM' && !e.repeat) { e.preventDefault(); toggleMode(); }
@@ -1027,6 +1029,7 @@
       barObserver.disconnect();
       closeActions();
       closeMore();
+      clearTimeout(tintTimer);
       chat?.querySelectorAll('.welcomePanel .qn-more').forEach(node => node.remove());
       state.enabled = false;
       mountEdges();
