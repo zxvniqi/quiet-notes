@@ -1,5 +1,5 @@
 @import url('./icons.css?v=1.0.0');
-:root { --qn-css: "1.1.5"; }
+:root { --qn-css: "1.1.6"; }
 /* Quiet Notes. Scoped to qn-active; disabling restores the existing theme.
    No font-family is set anywhere: the theme's own fonts are kept. */
 
@@ -1028,9 +1028,6 @@ html.qn-active #chat .welcomePanel .welcomeHeaderTitle::before {
 html.qn-active.qn-reader #chat .welcomePanel .welcomeHeaderTitle::before { content: '최근 읽은 책' !important; }
 /* The assistant's greeting stays off the start screen in both modes. */
 html.qn-active #chat:has(> .welcomePanel) > .mes:is([type="assistant_message"], [type="welcome_prompt"]) { display: none !important; }
-/* The book being read: the page it was left at, when one is remembered. */
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatStats .counterBlock > small[data-qn-page] { font-size: 0 !important; }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatStats .counterBlock > small[data-qn-page]::after { content: attr(data-qn-page) '쪽부터 ›'; font-size: 12px; }
 
 /* ── A row's menu (pin, rename, delete): a sheet of its own over the page, so no row can clip it.
    Its items press the row's own buttons. ── */
