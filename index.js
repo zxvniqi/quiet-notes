@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.1.4';
+  const VERSION = '1.1.5';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -269,12 +269,37 @@
     }
     // Start screen: every recent chat is a book (e-book) or a document (normal mode). Its own buttons
     // (pin, rename, delete) stay ST's; they wait in a small menu that ⋮ opens.
+    const rowMenu = el('div', { id: 'qn-row-menu', hidden: true });
+    rowMenu.setAttribute('role', 'menu');
+    document.body.append(rowMenu);
     let openMore = null;
     function closeMore() {
       if (!openMore) return;
-      openMore.classList.remove('qn-more-open');
-      openMore.querySelector('.qn-more')?.setAttribute('aria-expanded', 'false');
+      openMore.setAttribute('aria-expanded', 'false');
+      rowMenu.hidden = true;
+      rowMenu.replaceChildren();
       openMore = null;
+    }
+    function showMore(book, more) {
+      const items = [...book.querySelectorAll('.chatActions button')].map(source => {
+        const icon = [...(source.querySelector('i')?.classList || [])].filter(name => /^fa-/.test(name)).join(' ');
+        const item = el('button', { type: 'button', className: source.classList.contains('active') ? 'qn-on' : '' },
+          el('i', { className: icon }), el('span', { textContent: (source.title || source.getAttribute('aria-label') || '').trim() }));
+        item.setAttribute('role', 'menuitem');
+        item.addEventListener('click', () => { closeMore(); source.click(); });
+        return item;
+      });
+      if (!items.length) return;
+      rowMenu.replaceChildren(...items);
+      rowMenu.hidden = false;
+      openMore = more;
+      more.setAttribute('aria-expanded', 'true');
+      // Under ⋮, its right edge on ⋮'s; above it when there is no room below.
+      const at = more.getBoundingClientRect();
+      const size = rowMenu.getBoundingClientRect();
+      const below = at.bottom + 2 + size.height <= window.innerHeight - 8;
+      rowMenu.style.top = Math.max(8, below ? at.bottom + 2 : at.top - 2 - size.height) + 'px';
+      rowMenu.style.left = Math.max(8, Math.min(at.right - size.width, window.innerWidth - size.width - 8)) + 'px';
     }
     function moreButton(book) {
       const more = el('button', { type: 'button', className: 'qn-more', textContent: '⋮', title: '더 보기' });
@@ -283,14 +308,39 @@
       // The row itself opens the chat on a press: ⋮ keeps its presses to itself.
       more.addEventListener('click', e => {
         e.preventDefault(); e.stopPropagation();
-        const wasOpen = openMore === book;
+        const wasOpen = openMore === more;
         closeMore();
-        if (wasOpen) return;
-        openMore = book;
-        book.classList.add('qn-more-open');
-        more.setAttribute('aria-expanded', 'true');
+        if (!wasOpen) showMore(book, more);
       });
       return more;
+    }
+    // Where each book was left (e-book): chat → the message at the reading line and how far down it stood.
+    const PLACES = KEY + '.places';
+    let places = {};
+    try { const saved = JSON.parse(window.localStorage.getItem(PLACES) || '{}'); if (saved && typeof saved === 'object' && !Array.isArray(saved)) places = saved; } catch { /* Starts empty. */ }
+    const chatId = () => { try { return String(window.SillyTavern?.getContext?.().getCurrentChatId?.() ?? ''); } catch { return ''; } };
+    let placeReadyFor = ''; // the chat whose saved place has been looked up; nothing is saved for a chat before that
+    let placeTimer = 0;
+    function savePlace() {
+      const id = chatId();
+      if (!state.enabled || !state.reader || !id || placeReadyFor !== id || !chat?.querySelector('.mes[mesid]')) return;
+      const anchor = captureAnchor();
+      if (!anchor) return;
+      delete places[id];
+      const number = anchor.bottom ? NaN : Number(anchor.mes.getAttribute('mesid'));
+      if (Number.isInteger(number)) places[id] = [number, Math.round(anchor.offset)];
+      const ids = Object.keys(places);
+      for (const old of ids.slice(0, Math.max(0, ids.length - 150))) delete places[old];
+      try { window.localStorage.setItem(PLACES, JSON.stringify(places)); } catch { /* Kept for this session. */ }
+    }
+    // A chat just opened: ST shows its end. In the e-book it goes back to where the book was left.
+    function restorePlace() {
+      const id = chatId();
+      if (!id || placeReadyFor === id) return;
+      placeReadyFor = id;
+      const place = state.enabled && state.reader ? places[id] : null;
+      const mes = Array.isArray(place) ? chat?.querySelector('.mes[mesid="' + Number(place[0]) + '"]') : null;
+      if (mes) holdAnchor({ mes, offset: Number(place[1]) || 0, text: null, textOffset: 0 });
     }
     const defaultChatName = /\d{4}-\d{1,2}-\d{1,2}\s*@\s*\d{1,2}h\s*\d{1,2}m/;
     function markShelf(scope = chat) {
@@ -308,6 +358,10 @@
         const file = book.querySelector('.chatName > span:last-child')?.textContent || '';
         book.toggleAttribute('data-qn-plain', defaultChatName.test(file));
         if (!book.querySelector(':scope > .qn-more')) book.append(moreButton(book));
+        // The page the book was left at, when one is remembered.
+        const pages = book.querySelector('.chatStats .counterBlock > small');
+        const place = places[book.getAttribute('data-file') || ''];
+        if (pages) { if (Array.isArray(place)) pages.setAttribute('data-qn-page', String(Number(place[0]) + 1)); else pages.removeAttribute('data-qn-page'); }
       }
     }
     // Two zones of icon chips, like the message's own row and its ··· menu; a tap moves a button across.
@@ -840,7 +894,7 @@
           else node.querySelectorAll('.mes_buttons').forEach(found => menuRows.add(found));
           if (node.matches('.mes, .ch_name') || node.querySelector('.ch_name')) captionRoots.add(node);
           if (node.matches('#chat > .mes')) addedMessages++;
-          if (node.matches('.welcomePanel, .recentChat') || node.querySelector('.recentChat')) markShelf(node.closest('.welcomePanel') || node);
+          if (node.matches('.welcomePanel, .recentChat') || node.querySelector('.recentChat')) { placeReadyFor = ''; markShelf(node.closest('.welcomePanel') || node); } // back on the start screen: the next chat opened is looked up afresh
         }
       }
       for (const scope of mediaRoots) refreshShells(scope);
@@ -848,7 +902,7 @@
       menuRows.clear();
       // A chat opened or older messages shown: everything renders once more so their sizes are remembered
       // (one message at a time, as a reply streams in, needs nothing: it is on screen as it renders).
-      if (addedMessages > 1) skim(true);
+      if (addedMessages > 1) { skim(true); restorePlace(); }
       addedMessages = 0;
       for (const node of captionRoots) markCaptions(node);
       captionRoots.clear();
@@ -879,9 +933,8 @@
     document.addEventListener('pointerdown', e => {
       pressAt = openActions && !openActions.contains(e.target) ? { x: e.clientX, y: e.clientY } : null;
       if (!toc.hidden && !toc.contains(e.target) && !readerBar.contains(e.target)) showToc(false);
-      if (openMore && !e.target.closest?.('.qn-more, .chatActions')) closeMore();
+      if (openMore && !e.target.closest?.('.qn-more, #qn-row-menu')) closeMore();
     }, {signal: abort.signal});
-    chat?.addEventListener('click', e => { if (openMore && e.target.closest?.('.chatActions')) closeMore(); }, {signal: abort.signal});
     document.addEventListener('pointerup', e => {
       if (pressAt && openActions && !openActions.contains(e.target) && Math.hypot(e.clientX - pressAt.x, e.clientY - pressAt.y) < 10) closeActions();
       pressAt = null;
@@ -899,7 +952,13 @@
       const range = chat.scrollHeight - chat.clientHeight;
       bottomEdge.style.setProperty('--qn-read', (range > 0 ? Math.round(chat.scrollTop / range * 100) : 100) + '%');
     }
-    chat?.addEventListener('scroll', () => { if (!progressFrame && state.enabled && state.reader) progressFrame = requestAnimationFrame(updateProgress); }, {passive: true, signal: abort.signal});
+    chat?.addEventListener('scroll', () => {
+      if (!state.enabled || !state.reader) return;
+      if (!progressFrame) progressFrame = requestAnimationFrame(updateProgress);
+      if (openMore) closeMore();
+      clearTimeout(placeTimer);
+      placeTimer = setTimeout(savePlace, 500);
+    }, {passive: true, signal: abort.signal});
 
     let previousTitle = document.title;
     let renamedTitle = false;
@@ -1002,7 +1061,7 @@
       skim(false);
       const form = document.getElementById('form_sheld');
       if (form) form.inert = false;
-      for (const node of [dialog, readerBar, toc, wandContainer, settingsPanel]) node.remove();
+      for (const node of [dialog, readerBar, toc, rowMenu, wandContainer, settingsPanel]) node.remove();
       refreshShells();
       syncBlue();
       applyLooks();

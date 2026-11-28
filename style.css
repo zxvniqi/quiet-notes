@@ -1,5 +1,5 @@
 @import url('./icons.css?v=1.0.0');
-:root { --qn-css: "1.1.4"; }
+:root { --qn-css: "1.1.5"; }
 /* Quiet Notes. Scoped to qn-active; disabling restores the existing theme.
    No font-family is set anywhere: the theme's own fonts are kept. */
 
@@ -125,11 +125,7 @@ html.qn-active #chat .mes .mes_text { color: var(--qn-text); }
 .qn-active #chat .mes_text table { display: block; max-width: 100%; overflow-x: auto; }
 .qn-active #chat .mes_text a { color: var(--qn-info); text-decoration: underline; }
 .qn-active #chat .ch_name { color: var(--qn-muted); margin-bottom: 8px; }
-.qn-active:not(.qn-top-visible):not(.qn-reader) #chat .welcomePanel { display: none !important; }
 .qn-active #chat .welcomeHeaderLogo { display: none !important; }
-.qn-active #chat .welcomeHeaderVersionDisplay { font-size: 0 !important; }
-.qn-active #chat .welcomeHeaderVersionDisplay > * { display: none !important; }
-.qn-active #chat .welcomeHeaderVersionDisplay::after { content: '최근 문서'; font-size: 18px; font-weight: 600; }
 .qn-active #chat :is(.mes_buttons, .extraMesButtons) { color: var(--qn-muted); }
 /* Dark sheets: theme accent colours on scroll bars and sliders give way to the sheet's greys. */
 html.qn-active.qn-dark :is(.drawer-content, .drawer-content *, #extensionsMenu, #extensionsMenu *, .popup:not(:has(#loader)) *) { scrollbar-color: var(--qn-div) transparent !important; }
@@ -142,7 +138,7 @@ html.qn-active.qn-dark input[type="range"]::-webkit-slider-thumb { background: v
    Controls and labels outside the message text take the sheet's light text instead. */
 html.qn-active.qn-dark
   :is(#qn-boost#qn-boost#qn-boost, button, .menu_button, .menu_button_icon, .mes_button, .interactable, .drawer-icon, .list-group-item, .inline-drawer-header,
-      [class*="fa-"], select, input, textarea, label, h1, h2, h3, h4, h5, h6, small, b, strong):not(.mes_text *):not(.qn-settings-body *):not(.toast *) {
+      [class*="fa-"], select, input, textarea, label, h1, h2, h3, h4, h5, h6, small, b, strong):not(.mes_text *):not(.qn-settings-body *):not(.toast *):not(.tag):not(.tag *) {
   color: var(--qn-text) !important; -webkit-text-fill-color: currentColor !important; text-shadow: none !important;
 }
 /* Icon-only buttons sit a tone below the text (still well readable on the dark sheet), as on a light page. */
@@ -714,10 +710,10 @@ html.qn-active #sheld#sheld#sheld #chat .mes_text q { background-color: transpar
 html.qn-active :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *) { -webkit-text-fill-color: currentColor !important; }
 html.qn-active.qn-dark
   :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, .inline-drawer-content, #qr--popout, #movingDivs > div, #extensionTopBar)
-  :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *):not(.qn-settings-body *):not(.toast *) { color: var(--qn-text) !important; }
+  :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *):not(.qn-settings-body *):not(.toast *):not(.tag):not(.tag *) { color: var(--qn-text) !important; }
 html.qn-active.qn-dark
   :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div)
-  :is(#qn-boost#qn-boost#qn-boost, *):not(img, video, canvas, picture, svg, svg *, input, select, textarea, button, .menu_button, .text_pole, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *) {
+  :is(#qn-boost#qn-boost#qn-boost, *):not(img, video, canvas, picture, svg, svg *, input, select, textarea, button, .menu_button, .text_pole, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *, .tag, .tag *) {
   background-color: transparent !important; background-image: none !important; box-shadow: none !important; text-shadow: none !important; border-color: var(--qn-line) !important;
 }
 html.qn-active.qn-dark
@@ -878,7 +874,6 @@ html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boos
    (normal mode). The character is the title; ST's file name shows only when it was given by hand.
    Each row's own buttons (pin, rename, delete) wait in a small menu behind ⋮. ══ */
 html.qn-active #chat .welcomePanel { padding: 28px 0 0 !important; gap: 0 !important; background: transparent !important; border: 0 !important; }
-html.qn-active.qn-reader #chat .welcomeHeaderVersionDisplay::after { content: '최근 읽은 책'; }
 html.qn-active #chat .welcomePanel :is(.recentChatsTitle, .welcomeShortcuts > a, .welcomeShortcutsSeparator) { display: none !important; }
 /* The heading: a rule under the title, and quiet marks for its buttons (settings, fold, unfold). */
 html.qn-active #chat .welcomePanel .welcomeHeaderTitle { gap: 0 !important; padding: 6px 0 8px 2px !important; border-bottom: 1px solid var(--qn-div) !important; }
@@ -1017,24 +1012,61 @@ html.qn-active #sheld#sheld#sheld #chat .welcomePanel .recentChat > :is(#qn-boos
 html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .recentChat:first-child > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .qn-more) { top: 12px; }
 html.qn-active #sheld#sheld#sheld #chat .welcomePanel .recentChat > .qn-more:is(:active, :focus-visible) { background-color: var(--qn-soft) !important; }
 html.qn-active #chat .welcomePanel .chatActions { display: none !important; }
-html.qn-active #chat .welcomePanel .recentChat.qn-more-open { z-index: 5; }
-html.qn-active #chat .welcomePanel .recentChat.qn-more-open .chatActions {
-  display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 0 !important;
-  position: absolute; top: 40px; right: 0; z-index: 6; min-width: 150px; padding: 4px;
-  background: var(--qn-bg) !important; border: 1px solid var(--qn-line) !important; border-radius: 10px; box-shadow: 0 6px 20px #0000002e !important;
-}
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child.qn-more-open .chatActions { top: 46px; }
-html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, button) {
-  display: flex; align-items: center; justify-content: flex-start; gap: 10px; width: 100%; min-height: 40px; margin: 0 !important; padding: 0 12px !important;
-  border: 0 !important; border-radius: 6px !important; background-color: transparent !important; color: var(--qn-text) !important;
-  font-size: 13px !important; white-space: nowrap; opacity: 1 !important;
-}
-html.qn-active #chat .welcomePanel .chatActions button::after { content: attr(title); }
-html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions button:active { background-color: var(--qn-soft) !important; }
-html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions button > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i) { color: var(--qn-muted) !important; font-size: 13px !important; }
-html.qn-active #sheld#sheld#sheld #chat .welcomePanel .chatActions .pinChat.active > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i) { color: var(--qn-error) !important; }
 /* In the short shelf rows ⋮ sits level with the page count. */
 html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .recentChat:not(:first-child) > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .qn-more) { top: calc(50% - 17px); }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:not(:first-child).qn-more-open .chatActions { top: calc(50% + 17px); }
 /* Normal mode: the chat has no side margin of its own, so the list keeps one. */
-html.qn-active:not(.qn-reader) #chat .welcomePanel { padding: 28px 16px 0 !important; }
+html.qn-active:not(.qn-reader) #chat .welcomePanel { padding: 12px 16px 0 !important; }
+/* The start screen's layout and title are set here whole, so it stays the same when another extension
+   rearranges the panel or hides ST's own title parts. */
+html.qn-active #chat .welcomePanel { display: flex !important; flex-direction: column !important; padding-top: 12px !important; }
+html.qn-active #chat .welcomePanel .welcomeHeaderTitle { display: flex !important; justify-content: flex-start !important; align-items: center !important; width: 100% !important; }
+html.qn-active #chat .welcomePanel .welcomeHeaderVersionDisplay { display: none !important; }
+html.qn-active #chat .welcomePanel .welcomeHeaderTitle::before {
+  content: '최근 문서' !important; display: block !important; position: static !important; flex: 1 1 auto;
+  font-size: 18px; font-weight: 600; color: var(--qn-text); -webkit-text-fill-color: currentColor;
+}
+html.qn-active.qn-reader #chat .welcomePanel .welcomeHeaderTitle::before { content: '최근 읽은 책' !important; }
+/* The assistant's greeting stays off the start screen in both modes. */
+html.qn-active #chat:has(> .welcomePanel) > .mes:is([type="assistant_message"], [type="welcome_prompt"]) { display: none !important; }
+/* The book being read: the page it was left at, when one is remembered. */
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatStats .counterBlock > small[data-qn-page] { font-size: 0 !important; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat:first-child .chatStats .counterBlock > small[data-qn-page]::after { content: attr(data-qn-page) '쪽부터 ›'; font-size: 12px; }
+
+/* ── A row's menu (pin, rename, delete): a sheet of its own over the page, so no row can clip it.
+   Its items press the row's own buttons. ── */
+#qn-row-menu { display: none; }
+html.qn-active #qn-row-menu:not([hidden]) {
+  position: fixed; z-index: 3100; display: flex; flex-direction: column; min-width: 150px; max-width: calc(100vw - 16px); padding: 4px; box-sizing: border-box;
+  background: var(--qn-bg); color: var(--qn-text); border: 1px solid var(--qn-line); border-radius: 10px; box-shadow: 0 6px 20px #0000002e; text-shadow: none;
+}
+#qn-row-menu > button {
+  all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px 0 12px; border-radius: 6px;
+  font-size: 13.5px; color: var(--qn-text); -webkit-text-fill-color: currentColor; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+#qn-row-menu > button:is(:active, :focus-visible) { background: var(--qn-soft); }
+html.qn-active #qn-row-menu#qn-row-menu#qn-row-menu#qn-row-menu > button > i { width: 1.3em; text-align: center; font-size: 13px; color: var(--qn-muted) !important; }
+html.qn-active #qn-row-menu#qn-row-menu#qn-row-menu#qn-row-menu > button.qn-on > i { color: var(--qn-error) !important; }
+
+/* The top grip takes only a small strip around its line: buttons at the top of the page stay in reach. */
+.qn-edge-top > .qn-edge-grip { width: 150px; height: 28px; }
+
+/* ── Dark sheets: what tells a state by its colour keeps a colour — gold for favourites and cautions,
+   green for "on", red for "off" and danger. (The dark rules above give everything the sheet's text colour.) ── */
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .fav_on, .ch_fav_icon, .is_fav .ch_name, .warning, .neutral_warning,
+    #bg_selection_mode_button.active, #bulkEditButton.bulk_edit_overlay_active, [data-cc-toggle="false"] > .icon-unsupported):not(.qn-settings-body *) { color: var(--qn-warning) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .world_set, .success:not(.online_status_indicator), .toggle_enable, .extension_name.update_available,
+    [data-cc-toggle="true"] > .icon-supported, label[for="bind_preset_to_connection"]:has(input:checked)):not(.qn-settings-body *) { color: var(--qn-success) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .failure, .text_danger, .caution, .menu_button.togglable:not(.toggleEnabled),
+    #character_context_menu_delete):not(.qn-settings-body *) { color: var(--qn-error) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .menu_button.toggleable.toggled)::before { color: var(--qn-success) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .menu_button.toggleable.toggled) { border-color: var(--qn-success) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .menu_button.toggleable:not(.toggled), .tag.excluded)::before,
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .tag.excluded)::after { color: var(--qn-error) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .online_status_indicator) { background-color: var(--qn-error) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .online_status_indicator.success) { background-color: var(--qn-success) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .red_button, .redWarningBG, .popup-button-ok, #dialogue_popup_ok, #dialogue_del_mes_ok):not(.qn-settings-body *) {
+  background-color: color-mix(in srgb, var(--qn-error) 42%, var(--qn-bar)) !important;
+}
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .model-card.selected) { background-color: color-mix(in srgb, var(--qn-success) 30%, var(--qn-bar)) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .group_member.is_queued) { outline-color: var(--qn-warning) !important; }
+html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, .group_member.is_active) { outline-color: var(--qn-success) !important; }
