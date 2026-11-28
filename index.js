@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.1.1';
+  const VERSION = '1.1.2';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -589,7 +589,18 @@
       // A tap flips the bar; a drag of 16px or more opens or folds it by direction.
       let startY = null;
       let moved = false;
-      grip.addEventListener('pointerdown', e => { startY = e.clientY; moved = false; try { grip.setPointerCapture(e.pointerId); } catch { /* Synthetic events. */ } });
+      // The composer's grip lies where a thumb scrolls the page: only a press close to its line counts.
+      // The rest of the strip still takes the touch, so nothing behind it is pressed by mistake.
+      const nearLine = e => {
+        if (kind === 'top') return true;
+        const box = grip.getBoundingClientRect();
+        return Math.abs(e.clientX - (box.left + box.width / 2)) <= 70 && box.bottom - e.clientY <= 30;
+      };
+      grip.addEventListener('pointerdown', e => {
+        if (!nearLine(e)) { startY = null; return; }
+        startY = e.clientY; moved = false;
+        try { grip.setPointerCapture(e.pointerId); } catch { /* Synthetic events. */ }
+      });
       grip.addEventListener('pointermove', e => {
         if (startY === null) return;
         if (Math.abs(e.clientY - startY) > 8) moved = true;
