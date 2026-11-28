@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.1.0';
+  const VERSION = '1.1.1';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -265,6 +265,15 @@
         if (node.hasAttribute('data-qn-caption') || node.closest('.mes_buttons, .mes_edit_buttons')) continue;
         const parts = ['before', 'after'].filter(part => hasWords(node, '::' + part));
         if (parts.length) node.setAttribute('data-qn-caption', parts.join(' '));
+      }
+    }
+    // E-book start screen: every recent chat is a book, its cover printed with the character's name.
+    function markShelf(scope = chat) {
+      if (!scope || !state.enabled) return;
+      const books = scope.matches?.('.recentChat') ? [scope] : scope.querySelectorAll('.welcomePanel .recentChat');
+      for (const book of books) {
+        const title = (book.querySelector('.characterName')?.textContent || '').trim().slice(0, 40);
+        if (book.getAttribute('data-qn-title') !== title) book.setAttribute('data-qn-title', title);
       }
     }
     // Two zones of icon chips, like the message's own row and its ··· menu; a tap moves a button across.
@@ -665,8 +674,9 @@
     });
     tocButton.addEventListener('pointerdown', () => { panelsAtPress = openPanels(); }, true);
     const readerBar = el('nav', { id: 'qn-reader-bar' },
-      shelfButton, readerTitle, tocButton,
-      barButton('보기 설정', '<path d="M3 18l4.5-11L12 18M4.6 14.5h5.8"/><circle cx="17.5" cy="15.5" r="2.5"/><path d="M20 12.5V18"/>', () => { showToc(false); openDialog(true); }));
+      shelfButton, readerTitle,
+      barButton('보기 설정', '<path d="M3 18l4.5-11L12 18M4.6 14.5h5.8"/><circle cx="17.5" cy="15.5" r="2.5"/><path d="M20 12.5V18"/>', () => { showToc(false); openDialog(true); }),
+      tocButton);
     readerBar.setAttribute('aria-label', '읽기 도구');
     document.body.append(readerBar, toc);
 
@@ -785,6 +795,7 @@
           else node.querySelectorAll('.mes_buttons').forEach(found => menuRows.add(found));
           if (node.matches('.mes, .ch_name') || node.querySelector('.ch_name')) captionRoots.add(node);
           if (node.matches('#chat > .mes')) addedMessages++;
+          if (node.matches('.welcomePanel, .recentChat') || node.querySelector('.recentChat')) markShelf(node.closest('.welcomePanel') || node);
         }
       }
       for (const scope of mediaRoots) refreshShells(scope);
@@ -1018,6 +1029,21 @@
       })), 1200);
     }
     let lastCaptions = false;
+    // QuickActions copies the composer's button colour onto its shortcut panel when the panel opens.
+    // A mode or colour change after that would leave the old colour there (light icons on a light
+    // page): the copy is taken again once the new colours have settled.
+    let tintTimer = 0;
+    function syncShortcutTint() {
+      clearTimeout(tintTimer);
+      tintTimer = setTimeout(() => {
+        const panel = document.getElementById('stqa_floating_panel');
+        const reference = document.getElementById('options_button');
+        if (!panel || !reference || !panel.style.getPropertyValue('--stqa_shortcut_color')) return;
+        const { color, opacity } = getComputedStyle(reference);
+        panel.style.setProperty('--stqa_shortcut_color', color);
+        panel.style.setProperty('--stqa_shortcut_opacity', opacity);
+      }, 450);
+    }
     function apply() {
       const anchor = captureAnchor();
       const reader = state.enabled && state.reader;
@@ -1046,6 +1072,8 @@
       const form = document.getElementById('form_sheld');
       if (form) form.inert = state.enabled && !compose;
       arrangeAll();
+      markShelf();
+      syncShortcutTint();
       if (lastCaptions !== state.enabled) { markCaptions(chat, true); lastCaptions = state.enabled; }
       syncSettings();
       holdAnchor(anchor);
