@@ -4,7 +4,7 @@
   const document = window.document;
   const ID = 'qn-settings';
   const KEY = 'quiet-notes.extension.v2';
-  const VERSION = '1.1.2';
+  const VERSION = '1.1.3';
   if (document.getElementById(ID)) return;
   const flags = {
     enabled: false, top: false, compose: false, avatars: false, media: false, embeds: true, names: false, meta: true, actions: true,
@@ -268,12 +268,21 @@
       }
     }
     // E-book start screen: every recent chat is a book, its cover printed with the character's name.
+    const defaultChatName = /\d{4}-\d{1,2}-\d{1,2}\s*@\s*\d{1,2}h\s*\d{1,2}m/;
     function markShelf(scope = chat) {
       if (!scope || !state.enabled) return;
       const books = scope.matches?.('.recentChat') ? [scope] : scope.querySelectorAll('.welcomePanel .recentChat');
       for (const book of books) {
         const title = (book.querySelector('.characterName')?.textContent || '').trim().slice(0, 40);
         if (book.getAttribute('data-qn-title') !== title) book.setAttribute('data-qn-title', title);
+        // The cover's colour comes from the title, so a book keeps it wherever it stands on the shelf.
+        let sum = 0;
+        for (const char of title) sum = (sum * 31 + char.codePointAt(0)) % 9973;
+        const cover = String(sum % 6);
+        if (book.getAttribute('data-qn-cover') !== cover) book.setAttribute('data-qn-cover', cover);
+        // A chat still carrying the name ST gave it ("name - 2026-11-23@07h05m52s") shows no subtitle.
+        const file = book.querySelector('.chatName > span:last-child')?.textContent || '';
+        book.toggleAttribute('data-qn-plain', defaultChatName.test(file));
       }
     }
     // Two zones of icon chips, like the message's own row and its ··· menu; a tap moves a button across.

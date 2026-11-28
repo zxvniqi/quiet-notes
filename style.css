@@ -1,5 +1,5 @@
 @import url('./icons.css?v=1.0.0');
-:root { --qn-css: "1.1.2"; }
+:root { --qn-css: "1.1.3"; }
 /* Quiet Notes. Scoped to qn-active; disabling restores the existing theme.
    No font-family is set anywhere: the theme's own fonts are kept. */
 
@@ -125,7 +125,7 @@ html.qn-active #chat .mes .mes_text { color: var(--qn-text); }
 .qn-active #chat .mes_text table { display: block; max-width: 100%; overflow-x: auto; }
 .qn-active #chat .mes_text a { color: var(--qn-info); text-decoration: underline; }
 .qn-active #chat .ch_name { color: var(--qn-muted); margin-bottom: 8px; }
-.qn-active:not(.qn-top-visible) #chat .welcomePanel { display: none !important; }
+.qn-active:not(.qn-top-visible):not(.qn-reader) #chat .welcomePanel { display: none !important; }
 .qn-active #chat .welcomeHeaderLogo { display: none !important; }
 .qn-active #chat .welcomeHeaderVersionDisplay { font-size: 0 !important; }
 .qn-active #chat .welcomeHeaderVersionDisplay > * { display: none !important; }
@@ -876,7 +876,7 @@ html.qn-active.qn-dark :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boos
 
 /* ══ E-book start screen: the recent chats as books on a shelf. The character is the title (printed
    on the cover too), the chat's last lines are the blurb, the message count its pages. ══ */
-html.qn-active.qn-reader #chat .welcomePanel { padding: 4px 0 0 !important; gap: 0 !important; background: transparent !important; border: 0 !important; }
+html.qn-active.qn-reader #chat .welcomePanel { padding: 28px 0 0 !important; gap: 0 !important; background: transparent !important; border: 0 !important; }
 html.qn-active.qn-reader #chat .welcomeHeaderVersionDisplay::after { content: '최근 읽은 책'; }
 html.qn-active.qn-reader #chat .welcomePanel :is(.recentChatsTitle, .welcomeShortcuts > a, .welcomeShortcutsSeparator) { display: none !important; }
 html.qn-active.qn-reader #chat .welcomePanel .recentChatList { gap: 0 !important; }
@@ -887,11 +887,11 @@ html.qn-active.qn-reader #chat .welcomePanel .recentChat {
   background: transparent !important;
 }
 html.qn-active.qn-reader #chat .welcomePanel .recentChat.hidden { display: none !important; }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:nth-child(6n+2) { --qn-cover: #8a6f5c; }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:nth-child(6n+3) { --qn-cover: #5f7d6b; }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:nth-child(6n+4) { --qn-cover: #8c5a5a; }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:nth-child(6n+5) { --qn-cover: #7a6a8c; }
-html.qn-active.qn-reader #chat .welcomePanel .recentChat:nth-child(6n) { --qn-cover: #9a854f; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="1"] { --qn-cover: #8a6f5c; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="2"] { --qn-cover: #5f7d6b; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="3"] { --qn-cover: #8c5a5a; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="4"] { --qn-cover: #7a6a8c; }
+html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-cover="5"] { --qn-cover: #9a854f; }
 /* The cover: a spine shade down the left, the title in small print. */
 html.qn-active.qn-reader #chat .welcomePanel .recentChat::before {
   content: attr(data-qn-title) !important; display: block !important; position: static !important; box-sizing: border-box;
@@ -963,3 +963,7 @@ html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel :is(#qn-boost#qn
 html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .openTemporaryChat > :is(#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost#qn-boost, i, span) { color: inherit !important; }
 html.qn-active.qn-reader #chat .welcomePanel .openTemporaryChat > i::before { content: '\2b' !important; }
 html.qn-active.qn-reader #sheld#sheld#sheld #chat .welcomePanel .openTemporaryChat:active { background-color: var(--qn-soft) !important; }
+/* A chat with ST's default file name has no subtitle; the temporary chat is "an empty note". */
+html.qn-active.qn-reader #chat .welcomePanel .recentChat[data-qn-plain] .chatName > span:last-child { display: none !important; }
+html.qn-active.qn-reader #chat .welcomePanel .openTemporaryChat > span { font-size: 0 !important; }
+html.qn-active.qn-reader #chat .welcomePanel .openTemporaryChat > span::after { content: '빈 노트'; font-size: 13px; }
