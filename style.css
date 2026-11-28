@@ -138,7 +138,7 @@ html.qn-active.qn-dark input[type="range"]::-webkit-slider-thumb { background: v
    Controls and labels outside the message text take the sheet's light text instead. */
 html.qn-active.qn-dark
   :is(#qn-boost#qn-boost#qn-boost, button, .menu_button, .menu_button_icon, .mes_button, .interactable, .drawer-icon, .list-group-item, .inline-drawer-header,
-      [class*="fa-"], select, input, textarea, label, h1, h2, h3, h4, h5, h6, small, b, strong):not(.mes_text *):not(.qn-settings-body *):not(.toast *):not(.tag):not(.tag *) {
+      [class*="fa-"], select, input, textarea, label, h1, h2, h3, h4, h5, h6, small, b, strong):not(.mes_text *):not(.qn-settings-body *):not(.toast *):not(.tag:is([style^="color:"], [style*="; color:"])):not(.tag:is([style^="color:"], [style*="; color:"]) *) {
   color: var(--qn-text) !important; -webkit-text-fill-color: currentColor !important; text-shadow: none !important;
 }
 /* Icon-only buttons sit a tone below the text (still well readable on the dark sheet), as on a light page. */
@@ -710,7 +710,7 @@ html.qn-active #sheld#sheld#sheld #chat .mes_text q { background-color: transpar
 html.qn-active :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *) { -webkit-text-fill-color: currentColor !important; }
 html.qn-active.qn-dark
   :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, .inline-drawer-content, #qr--popout, #movingDivs > div, #extensionTopBar)
-  :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *):not(.qn-settings-body *):not(.toast *):not(.tag):not(.tag *) { color: var(--qn-text) !important; }
+  :is(#qn-boost#qn-boost#qn-boost, *):not(.mes_text):not(.mes_text *):not(.qn-settings-body *):not(.toast *):not(.tag:is([style^="color:"], [style*="; color:"])):not(.tag:is([style^="color:"], [style*="; color:"]) *) { color: var(--qn-text) !important; }
 html.qn-active.qn-dark
   :is(.drawer-content, .popup:not(:has(#loader)), dialog:not(#qn-dialog):not(:has(#loader)), #extensionsMenu, .options-content, .list-group, #qr--popout, #movingDivs > div)
   :is(#qn-boost#qn-boost#qn-boost, *):not(img, video, canvas, picture, svg, svg *, input, select, textarea, button, .menu_button, .text_pole, .mes_text, .mes_text *, .qn-settings-body, .qn-settings-body *, .avatar, .avatar *, .avatar-container *, [class*="thumb"], .bg_example, .bg_example *, .tag, .tag *) {
